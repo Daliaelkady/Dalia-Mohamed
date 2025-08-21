@@ -1,198 +1,7 @@
-<section class="custom-banner">
-  <div class="banner-container">
-    <div class="banner-text">
-      <h1>{{ section.settings.brand_name }}</h1>
-      <p class="tagline">{{ section.settings.tagline }}</p>
-      <a href="{{ section.settings.button_link }}" class="btn-main">{{ section.settings.button_label }}</a>
-      <p class="subtext">{{ section.settings.subtext }}</p>
-    </div>
-   
-  </div>
-</section>
-
-<section class="gift-guide">
-  <div class="gift-container">
-    <div class="gift-text">
-      <h2>{{ section.settings.gift_heading }}</h2>
-      <p>{{ section.settings.gift_description }}</p>
-      <a href="{{ section.settings.gift_button_link }}" class="btn-secondary">
-        {{ section.settings.gift_button_label }}
-        <span class="arrow">→</span>
-      </a>
-      <div class="bottom-text">
-        {{ section.settings.gift_bottom_text }}
-      </div>
-    </div>
-  </div>
-</section>
-
-<style>
-
-.custom-banner {
-  padding: 5rem 2rem;
-  background: #f5f5f5;
-}
-
-.custom-banner .banner-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 3rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.custom-banner .banner-text {
-  flex: 1;
-}
-
-.custom-banner h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin: 0 0 1rem;
-}
-
-.custom-banner .tagline {
-  font-size: 1.2rem;
-  margin-bottom: 1.5rem;
-}
-
-.custom-banner .btn-main {
-  background: #e63946;
-  color: #fff;
-  padding: 0.9rem 1.6rem;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
-  transition: all 0.3s ease;
-  display: inline-block;
-}
-
-.custom-banner .btn-main:hover {
-  background: #b71c1c;
-  transform: scale(1.05);
-}
-
-.custom-banner .subtext {
-  margin-top: 1.5rem;
-  font-size: 0.9rem;
-  font-style: italic;
-}
-
-.custom-banner .banner-image {
-  flex: 1;
-}
-
-.custom-banner .banner-image img {
-  width: 100%;
-  border-radius: 10px;
-}
-
-/* ===========================
-   GIFT GUIDE (Left image, Right text)
-   =========================== */
-.gift-guide {
-  padding: 4rem 2rem;
-  background: #fff;
-}
-
-.gift-guide .gift-container {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 3rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.gift-guide .gift-image {
-  flex: 1;
-}
-
-.gift-guide .gift-image img {
-  width: 100%;
-  border-radius: 10px;
-}
-
-.gift-guide .gift-text {
-  flex: 1;
-  text-align: left;
-}
-
-.gift-guide h2 {
-  font-size: 2rem;
-  margin-bottom: 1rem;
-  font-weight: 700;
-  color: #111;
-}
-
-.gift-guide p {
-  font-size: 1rem;
-  margin-bottom: 2rem;
-  max-width: 500px;
-  color: #444;
-}
-
-.gift-guide .btn-secondary {
-  background: #1d3557;
-  color: #fff;
-  padding: 0.9rem 1.5rem;
-  text-decoration: none;
-  border-radius: 6px;
-  display: inline-flex;
-  align-items: center;
-  font-weight: 600;
-  transition: all 0.3s ease;
-}
-
-.gift-guide .btn-secondary:hover {
-  background: #457b9d;
-  transform: scale(1.05);
-}
-
-.gift-guide .btn-secondary .arrow {
-  margin-left: 10px;
-  transition: transform 0.3s ease;
-}
-
-.gift-guide .btn-secondary:hover .arrow {
-  transform: translateX(5px);
-}
-
-.gift-guide .bottom-text {
-  margin-top: 1.5rem;
-  font-size: 0.85rem;
-  color: #d00;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-/* ===========================
-   RESPONSIVE
-   =========================== */
-@media(max-width: 768px) {
-  .custom-banner .banner-container,
-  .gift-guide .gift-container {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .custom-banner .banner-text,
-  .gift-guide .gift-text {
-    text-align: center;
-  }
-}
-</style>
-
 {% schema %}
 {
-  "name": "Custom Home",
+  "name": "Banner + Gift",
   "settings": [
-    {
-      "type": "image_picker",
-      "id": "banner_image",
-      "label": "Banner Image"
-    },
     {
       "type": "text",
       "id": "brand_name",
@@ -201,15 +10,9 @@
     },
     {
       "type": "text",
-      "id": "tagline",
-      "label": "Tagline",
-      "default": "Luxury Meets Comfort"
-    },
-    {
-      "type": "text",
-      "id": "button_label",
-      "label": "Banner Button Label",
-      "default": "SHOP NOW"
+      "id": "banner_heading",
+      "label": "Banner Heading",
+      "default": "Welcome to Dalia DH"
     },
     {
       "type": "url",
@@ -219,51 +22,104 @@
     },
     {
       "type": "text",
-      "id": "subtext",
-      "label": "Banner Subtext",
-      "default": "Sustainable, Ethically Made Clothes in Sizes XXS to 6XL"
+      "id": "button_label",
+      "label": "Banner Button Text",
+      "default": "Shop Now"
     },
     {
       "type": "image_picker",
-      "id": "gift_image",
-      "label": "Gift Guide Image"
+      "id": "banner_image",
+      "label": "Banner Image"
     },
     {
       "type": "text",
       "id": "gift_heading",
-      "label": "Gift Guide Heading",
-      "default": "The Gift Guide"
-    },
-    {
-      "type": "textarea",
-      "id": "gift_description",
-      "label": "Gift Guide Description",
-      "default": "Discover Joy: Your Ultimate Holiday Gift Destination."
-    },
-    {
-      "type": "text",
-      "id": "gift_button_label",
-      "label": "Gift Guide Button Label",
-      "default": "SHOP NOW"
+      "label": "Gift Heading",
+      "default": "Gift Guide"
     },
     {
       "type": "url",
       "id": "gift_button_link",
-      "label": "Gift Guide Button Link",
+      "label": "Gift Button Link",
       "default": "/"
     },
     {
       "type": "text",
-      "id": "gift_bottom_text",
-      "label": "Gift Guide Bottom Text",
-      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+      "id": "gift_button_label",
+      "label": "Gift Button Text",
+      "default": "View Gift Guide"
+    },
+    {
+      "type": "image_picker",
+      "id": "gift_image",
+      "label": "Gift Image"
     }
   ],
   "presets": [
     {
-      "name": "Custom Home",
-      "category": "Custom"
+      "name": "Banner + Gift"
     }
   ]
 }
 {% endschema %}
+
+<section class="custom-banner">
+  <div class="content left">
+    <h2>{{ section.settings.brand_name }}</h2>
+    <h1>{{ section.settings.banner_heading }}</h1>
+    <a href="{{ section.settings.button_link }}" class="btn">{{ section.settings.button_label }}</a>
+  </div>
+  <div class="image right">
+    {% if section.settings.banner_image != blank %}
+      <img src="{{ section.settings.banner_image | image_url: width: 600 }}" alt="Banner">
+    {% endif %}
+  </div>
+</section>
+
+<section class="gift-guide">
+  <div class="image left">
+    {% if section.settings.gift_image != blank %}
+      <img src="{{ section.settings.gift_image | image_url: width: 600 }}" alt="Gift">
+    {% endif %}
+  </div>
+  <div class="content right">
+    <h2>{{ section.settings.gift_heading }}</h2>
+    <a href="{{ section.settings.gift_button_link }}" class="btn alt">{{ section.settings.gift_button_label }}</a>
+  </div>
+</section>
+
+<style>
+.custom-banner, .gift-guide {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 40px 20px;
+}
+.custom-banner .content, .gift-guide .content {
+  max-width: 45%;
+}
+.custom-banner .image, .gift-guide .image {
+  max-width: 45%;
+}
+.custom-banner h1 {
+  font-size: 28px;
+  margin: 10px 0;
+}
+.custom-banner h2 {
+  font-size: 16px;
+  color: #777;
+  text-transform: uppercase;
+}
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #457b9d;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+}
+.btn.alt {
+  background: #e63946;
+}
+</style>
