@@ -58,21 +58,58 @@
     .custom-banner h1{ font-size: 32px; }
     .custom-banner p {font-size: 16px;}
 }
-</style> 
+<style>
+.custom-banner {
+  text-align: center;
+  padding: 50px 20px;<style>
+  }
+.custom-banner {
+  text-align: center;
+  padding: 50px 20px;
+  background: url('{{ "banner-background.jpg" | asset_url }}') center/cover no-repeat;
+}
+
+.top-button, .main-button {
+  display: inline-block;
+  padding: 10px 25px;
+  background-color: #ffeb3b;
+  color: #000;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.top-button:hover, .main-button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.brand-name, .main-title {
+  font-weight: bold;
+}
+
+.banner-footer {
+  margin-top: 20px;
+  font-size: 12px;
+  color: #555;
+}
+</style>
+
 
 {% schema %}
 {
-    "name": "Custom Banner",
-    "settings": [
-        { "type": "text", "id": "title-text", "label": "Title", "default": "Welcome to Our Store"},
-        { "type": "text", "id": "subtitle-text", "label": "subtitle", "default": "Discover our latest products!"},
-        { "type": "url", "id": "button_link", "label": "Button Link", "default": "/collections/all"},
-        { "type": "text", "id": "button_text", "label": "Button text", "default": "Shop Now"},
-        { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ff69b4"},
-        { "type": "color", "id": "text_color", "label": "Text Color", "default": "#ffffff"},
-        { "type": "color", "id": "button_bg", "label": "Button Background Color", "default": "#ffffff"},
-        { "type": "color", "id": "button_text_color", "label": "Button Text Color", "default": "#ff69b4"},
-    ],
-    "presets": [{"name": "Custom Banner", "category": "Banner"}]
+  "name": "Custom Banner",
+  "settings": [
+    { "type": "text", "id": "brand_name", "label": "Brand Name", "default": "TISSO VISON" },
+    { "type": "text", "id": "top_text", "label": "Top Text", "default": "Find the ideal gift for your loved ones." },
+    { "type": "text", "id": "top_button_text", "label": "Top Button Text", "default": "CHOOSE GIFT" },
+    
+
+    { "type": "text", "id": "main_title", "label": "Main Title", "default": "The Gift Guide" },
+    { "type": "textarea", "id": "main_text", "label": "Main Text", "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season." },
+    { "type": "text", "id": "main_button_text", "label": "Main Button Text", "default": "SHOP NOW" },
+   
+
+    { "type": "text", "id": "footer_text", "label": "Footer Text", "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL" }
+  ]
 }
 {% endschema %}
