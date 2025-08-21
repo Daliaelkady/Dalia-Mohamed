@@ -34,4 +34,21 @@
     .custom-banner h1{ font-size: 32px; }
     .custom-banner p {font-size: 16px;}
 }
-</style>
+</style> 
+
+{% schema %}
+{
+    "name": "Custom Banner",
+    "settings": [
+        { "type": "text", "id": "title-text", "label": "Title", "default": "Welcome to Our Store"},
+        { "type": "text", "id": "subtitle-text", "label": "subtitle", "default": "Discover our latest products!"},
+        { "type": "url", "id": "button_link", "label": "Button Link", "default": "/collections/all"},
+        { "type": "text", "id": "button_text", "label": "Button text", "default": "Shop Now"},
+        { "type": "color", "id": "bg_color", "label": "Background Color", "default": "#ff69b4"},
+        { "type": "color", "id": "text_color", "label": "Text Color", "default": "#ffffff"},
+        { "type": "color", "id": "button_bg", "label": "Button Background Color", "default": "#ffffff"},
+        { "type": "color", "id": "button_text_color", "label": "Button Text Color", "default": "#ff69b4"},
+    ],
+    "presets": [{"name": "Custom Banner", "category": "Banner"}]
+}
+{% endschema %}
