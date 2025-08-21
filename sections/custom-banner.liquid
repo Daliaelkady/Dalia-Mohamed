@@ -2,7 +2,7 @@
     <div class="banner-content">
         <h1>{{ section.settings.title_text | default: "Welcome to Our Store" }}</h1>
         <p>{{ section.settings.subtitle_text | default: "Discover our latest products!"}}</p>
-        <a href="{{ section.settings.button_link }}" class="btn">{{ section.settings.button_link }}</a>
+        <a href="{{ section.settings.button_link | default: "/collections/all" }}" class="btn">{{ section.settings.button_link }}</a>
     </div>
 </section>    
 
