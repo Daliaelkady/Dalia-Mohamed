@@ -1,32 +1,142 @@
-<div class="product-grid">
-    {% for product in section.settings.products %}
-        <div class="product-block" data-product-id="{{ product.id }}">
-            <h2>{{ product.title }}</h2>
-            <p>{{ product.price | money }}</p>
-            <button class="view-product" onclick="showPopup('{{ product.id }}')">View</button>
+{% schema %}
+{
+  "name": "Product Grid with Popup",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product Block",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Select Product" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [{ "name": "Custom Product Grid" }]
+}
+{% endschema %}
+
+<section class="grid-section">
+  <div class="grid-container">
+    {% for block in section.blocks %}
+      {% assign product = all_products[block.settings.product] %}
+      {% if product %}
+        <div class="grid-item" data-product-handle="{{ product.handle }}">
+          <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}">
+          <h3>{{ product.title }}</h3>
+          <p>{{ product.price | money }}</p>
+          <button class="open-popup" data-handle="{{ product.handle }}">View</button>
         </div>
+      {% endif %}
     {% endfor %}
+  </div>
+</section>
+
+<!-- Popup Modal -->
+<div id="product-popup" class="popup hidden">
+  <div class="popup-content">
+    <span class="close">&times;</span>
+    <div id="popup-body"></div>
+  </div>
 </div>
 
 <style>
-    .product-grid {
-        /* Add your styles here */
-    }
-    .product-block {
-        /* Add styles for product blocks */
-    }
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+  gap: 20px;
+}
+.grid-item {
+  border: 1px solid #eee;
+  padding: 20px;
+  text-align: center;
+  border-radius: 12px;
+}
+.grid-item img { width: 100%; border-radius: 10px; }
+.open-popup {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #1d3557;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.open-popup:hover { background: #457b9d; }
+.popup {
+  position: fixed;
+  top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.7);
+  display:flex; align-items:center; justify-content:center;
+}
+.popup.hidden { display:none; }
+.popup-content {
+  background:#fff;
+  padding:30px;
+  border-radius:16px;
+  max-width:600px;
+  width:90%;
+  position:relative;
+}
+.close {
+  position:absolute; top:10px; right:20px; cursor:pointer;
+  font-size:24px;
+}
+@media(max-width:768px){
+  .grid-container { grid-template-columns: 1fr 1fr; }
+}
 </style>
 
-{% schema %}
-{
-    "name": "Product Grid",
-    "settings": [
-        {
-            "type": "product_list",
-            "id": "products",
-            "label": "Select Products",
-            "info": "Select up to 6 products"
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("product-popup");
+  const popupBody = document.getElementById("popup-body");
+  const closeBtn = popup.querySelector(".close");
+
+  document.querySelectorAll(".open-popup").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const handle = btn.dataset.handle;
+      const res = await fetch(`/products/${handle}.js`);
+      const product = await res.json();
+
+      let variantsHtml = product.variants.map(v =>
+        `<option value="${v.id}">${v.title} - ${Shopify.formatMoney(v.price)}</option>`
+      ).join("");
+
+      popupBody.innerHTML = `
+        <h2>${product.title}</h2>
+        <p>${product.description}</p>
+        <select id="variantSelect">${variantsHtml}</select>
+        <button id="addToCart">Add to Cart</button>
+      `;
+
+      popup.classList.remove("hidden");
+
+      document.getElementById("addToCart").addEventListener("click", async () => {
+        const variantId = document.getElementById("variantSelect").value;
+        let items = [{ id: variantId, quantity: 1 }];
+
+        // Auto-add Soft Winter Jacket if Black & Medium chosen
+        const variant = product.variants.find(v => v.id == variantId);
+        if (variant && variant.title.includes("Black") && variant.title.includes("Medium")) {
+          const jacket = await fetch('/products/soft-winter-jacket.js').then(r => r.json());
+          items.push({ id: jacket.variants[0].id, quantity: 1 });
         }
-    ]
-}
-{% endschema %}
+
+        await fetch("/cart/add.js", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items })
+        });
+
+        alert("Added to cart!");
+        popup.classList.add("hidden");
+      });
+    });
+  });
+
+  closeBtn.addEventListener("click", () => popup.classList.add("hidden"));
+  window.addEventListener("click", e => { if (e.target === popup) popup.classList.add("hidden") });
+});
+</script>
