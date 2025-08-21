@@ -8,14 +8,14 @@
 
 <style>
     .banner {
-        background-image: url('{{ section.settings.background_image | img_url: '2048x2048' }}'); /* Background image */
-        background-size: cover; /* Cover the entire section */
-        background-position: center; /* Center the background image */
-        padding: 60px 20px; /* Padding around the banner */
-        text-align: center; /* Center align text */
-        color: white; /* Text color */
-        position: relative; /* Position for button animation */
-        overflow: hidden; /* Hide overflow for animations */
+        background-image: url('{{ section.settings.background_image | img_url: '2048x2048' }}'); 
+        background-size: cover; 
+        background-position: center;
+        padding: 60px 20px; 
+        text-align: center; 
+        color: white;
+        position: relative; 
+        overflow: hidden; 
     }
 
     .banner::before {
@@ -25,51 +25,51 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-color: rgba(0, 0, 0, 0.5); /* Dark overlay for better text visibility */
-        z-index: 1; /* Place overlay below text */
+        background-color: rgba(0, 0, 0, 0.5); 
+        z-index: 1; 
     }
 
     .banner-content {
-        position: relative; /* Position relative to overlay */
-        z-index: 2; /* Place content above overlay */
-        max-width: 800px; /* Max width for content */
-        margin: 0 auto; /* Center the content */
+        position: relative; 
+        z-index: 2; 
+        max-width: 800px; 
+        margin: 0 auto; 
     }
 
     h1 {
-        font-size: 3em; /* Font size for the title */
-        margin-bottom: 20px; /* Space below the title */
-        animation: fadeIn 1s ease; /* Fade-in animation */
+        font-size: 3em;
+        margin-bottom: 20px; 
+        animation: fadeIn 1s ease; 
     }
 
     p {
-        font-size: 1.5em; /* Font size for the description */
-        margin-bottom: 30px; /* Space below the description */
-        animation: fadeIn 1.5s ease; /* Fade-in animation */
+        font-size: 1.5em; 
+        margin-bottom: 30px; 
+        animation: fadeIn 1.5s ease; 
     }
 
     .banner-button {
-        background-color: #ff4081; /* Button background color */
-        color: white; /* Button text color */
-        border: none; /* No border */
-        padding: 15px 30px; /* Padding for the button */
-        font-size: 1.2em; /* Font size for the button */
-        cursor: pointer; /* Pointer cursor on hover */
-        transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover */
-        border-radius: 5px; /* Rounded corners */
-        position: relative; /* Position for button animation */
-        overflow: hidden; /* Hide overflow for animations */
+        background-color: #ff4081; 
+        color: white; 
+        border: none; 
+        padding: 15px 30px; 
+        font-size: 1.2em; 
+        cursor: pointer; 
+        transition: background-color 0.3s ease, transform 0.3s ease; 
+        border-radius: 5px; 
+        position: relative; 
+        overflow: hidden; 
     }
 
     .banner-button:hover {
-        background-color: #e91e63; /* Darker pink on hover */
-        transform: scale(1.05); /* Slightly enlarge button on hover */
+        background-color: #e91e63; 
+        transform: scale(1.05); 
     }
 
     @keyframes fadeIn {
         from {
             opacity: 0;
-            transform: translateY(20px); /* Slide in from below */
+            transform: translateY(20px); 
         }
         to {
             opacity: 1;
@@ -79,16 +79,16 @@
 
     @media (max-width: 768px) {
         h1 {
-            font-size: 2.5em; /* Smaller title on mobile */
+            font-size: 2.5em; 
         }
 
         p {
-            font-size: 1.2em; /* Smaller description on mobile */
+            font-size: 1.2em; 
         }
 
         .banner-button {
-            padding: 10px 20px; /* Smaller padding on mobile */
-            font-size: 1em; /* Smaller font size on mobile */
+            padding: 10px 20px; 
+            font-size: 1em; 
         }
     }
 </style>
