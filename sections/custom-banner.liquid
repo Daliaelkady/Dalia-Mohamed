@@ -8,62 +8,94 @@
 
 <style>
     .banner {
-        background-color: #f8f9fa; /* Light background color */
-        padding: 40px 20px; /* Padding around the banner */
+        background-image: url('{{ section.settings.background_image | img_url: '2048x2048' }}'); /* Background image */
+        background-size: cover; /* Cover the entire section */
+        background-position: center; /* Center the background image */
+        padding: 60px 20px; /* Padding around the banner */
         text-align: center; /* Center align text */
+        color: white; /* Text color */
         position: relative; /* Position for button animation */
+        overflow: hidden; /* Hide overflow for animations */
+    }
+
+    .banner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5); /* Dark overlay for better text visibility */
+        z-index: 1; /* Place overlay below text */
     }
 
     .banner-content {
+        position: relative; /* Position relative to overlay */
+        z-index: 2; /* Place content above overlay */
         max-width: 800px; /* Max width for content */
         margin: 0 auto; /* Center the content */
     }
 
     h1 {
-        font-size: 2.5em; /* Font size for the title */
-        color: #333; /* Dark text color */
+        font-size: 3em; /* Font size for the title */
         margin-bottom: 20px; /* Space below the title */
+        animation: fadeIn 1s ease; /* Fade-in animation */
     }
 
     p {
-        font-size: 1.2em; /* Font size for the description */
-        color: #666; /* Medium text color */
+        font-size: 1.5em; /* Font size for the description */
         margin-bottom: 30px; /* Space below the description */
+        animation: fadeIn 1.5s ease; /* Fade-in animation */
     }
 
     .banner-button {
-        background-color: #007bff; /* Button background color */
+        background-color: #ff4081; /* Button background color */
         color: white; /* Button text color */
         border: none; /* No border */
         padding: 15px 30px; /* Padding for the button */
-        font-size: 1em; /* Font size for the button */
+        font-size: 1.2em; /* Font size for the button */
         cursor: pointer; /* Pointer cursor on hover */
-        transition: background-color 0.3s ease; /* Smooth transition for hover */
+        transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition for hover */
         border-radius: 5px; /* Rounded corners */
+        position: relative; /* Position for button animation */
+        overflow: hidden; /* Hide overflow for animations */
     }
 
     .banner-button:hover {
-        background-color: #0056b3; /* Darker blue on hover */
+        background-color: #e91e63; /* Darker pink on hover */
+        transform: scale(1.05); /* Slightly enlarge button on hover */
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px); /* Slide in from below */
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
     @media (max-width: 768px) {
         h1 {
-            font-size: 2em; /* Smaller title on mobile */
+            font-size: 2.5em; /* Smaller title on mobile */
         }
 
         p {
-            font-size: 1em; /* Smaller description on mobile */
+            font-size: 1.2em; /* Smaller description on mobile */
         }
 
         .banner-button {
             padding: 10px 20px; /* Smaller padding on mobile */
+            font-size: 1em; /* Smaller font size on mobile */
         }
     }
 </style>
 
 {% schema %}
 {
-    "name": "Banner",
+    "name": "Advanced Banner",
     "settings": [
         {
             "type": "text",
@@ -82,6 +114,11 @@
             "id": "button_text",
             "label": "Button Text",
             "default": "Shop Now"
+        },
+        {
+            "type": "image_picker",
+            "id": "background_image",
+            "label": "Background Image"
         }
     ]
 }
