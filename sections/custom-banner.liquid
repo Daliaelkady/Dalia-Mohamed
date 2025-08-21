@@ -1,43 +1,5 @@
-{% schema %}
-{
-  "name": "Custom Banner",
-  "settings": [
-    {
-      "type": "text",
-      "id": "brand_name",
-      "label": "Brand Name",
-      "default": "TISSO VISON"
-    },
-    {
-      "type": "text",
-      "id": "tagline",
-      "label": "Tagline",
-      "default": "Find the ideal gift for your loved ones."
-    },
-    {
-      "type": "text",
-      "id": "button_label",
-      "label": "Button Label",
-      "default": "CHOOSE GIFT"
-    },
-    {
-      "type": "url",
-      "id": "button_link",
-      "label": "Button Link",
-      "default": "/collections/all"
-    }
-  ],
-  "presets": [
-    {
-      "name": "Custom Banner",
-      "category": "Custom"
-    }
-  ]
-}
-{% endschema %}
-
 <section class="custom-banner">
-  <div class="custom-banner">
+  <div class="banner-container">
     <span class="brand">{{ section.settings.brand_name }}</span>
     <span class="tagline">{{ section.settings.tagline }}</span>
     <a href="{{ section.settings.button_link }}" class="banner-btn">
@@ -96,3 +58,41 @@
   transform: translateX(5px);
 }
 </style>
+
+{% schema %}
+{
+  "name": "Custom Banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand Name",
+      "default": "TISSO VISON"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Find the ideal gift for your loved ones."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "CHOOSE GIFT"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link",
+      "default": "/collections/all"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Banner",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
