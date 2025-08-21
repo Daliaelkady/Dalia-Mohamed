@@ -1,9 +1,5 @@
 <section class="custom-banner">
-  {% if section.settings.banner_image != blank %}
-    <div class="image">
-      <img src="{{ section.settings.banner_image | img_url: '800x' }}" alt="Banner">
-    </div>
-  {% endif %}
+ 
   <div class="content left">
     <h2>{{ section.settings.brand_name }}</h2>
     <h1>{{ section.settings.banner_heading }}</h1>
@@ -16,9 +12,7 @@
     <h2>{{ section.settings.gift_heading }}</h2>
     <a href="{{ section.settings.gift_button_link }}" class="btn alt">{{ section.settings.gift_button_label }}</a>
   </div>
-  {% if section.settings.gift_image != blank %}
-
-  {% endif %}
+  
 </section>
 
 <style>
