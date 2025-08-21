@@ -1,150 +1,32 @@
-{% schema %}
-{
-  "name": "Product Grid + Popup",
-  "settings": [],
-  "blocks": [
-    {
-      "type": "product",
-      "name": "Product",
-      "settings": [
-        {
-          "type": "product",
-          "id": "product",
-          "label": "Select product"
-        }
-      ]
-    }
-  ],
-  "max_blocks": 6,
-  "presets": [
-    {
-      "name": "Product Grid + Popup",
-      "category": "Products"
-    }
-  ]
-}
-{% endschema %}
-
 <div class="product-grid">
-  {% for block in section.blocks %}
-    {% assign product = all_products[block.settings.product] %}
-    {% if product %}
-      <div class="product-card" data-handle="{{ product.handle }}">
-        <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}">
-        <h3>{{ product.title }}</h3>
-        <p>{{ product.price | money }}</p>
-        <button class="open-popup" data-handle="{{ product.handle }}">View</button>
-      </div>
-    {% endif %}
-  {% endfor %}
-</div>
-
-<!-- Popup Modal -->
-<div id="product-popup" class="popup hidden">
-  <div class="popup-content">
-    <span class="close">&times;</span>
-    <div class="popup-body"></div>
-  </div>
+    {% for product in section.settings.products %}
+        <div class="product-block" data-product-id="{{ product.id }}">
+            <h2>{{ product.title }}</h2>
+            <p>{{ product.price | money }}</p>
+            <button class="view-product" onclick="showPopup('{{ product.id }}')">View</button>
+        </div>
+    {% endfor %}
 </div>
 
 <style>
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
-  gap: 20px;
-  padding: 20px;
-}
-.product-card {
-  border: 1px solid #eee;
-  padding: 15px;
-  text-align: center;
-  border-radius: 8px;
-}
-.product-card img {
-  max-width: 100%;
-  border-radius: 6px;
-}
-button {
-  background: #457b9d;
-  color: #fff;
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-button:hover {
-  background: #1d3557;
-}
-.popup {
-  position: fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.5);
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-.popup.hidden { display: none; }
-.popup-content {
-  background:#fff;
-  padding:20px;
-  border-radius:8px;
-  max-width:500px;
-  width:90%;
-  position: relative;
-}
-.popup-content .close {
-  position:absolute;
-  top:10px; right:15px;
-  cursor:pointer;
-  font-size:22px;
-}
+    .product-grid {
+        /* Add your styles here */
+    }
+    .product-block {
+        /* Add styles for product blocks */
+    }
 </style>
 
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  const popup = document.getElementById("product-popup");
-  const popupBody = popup.querySelector(".popup-body");
-  const closeBtn = popup.querySelector(".close");
-
-  document.querySelectorAll(".open-popup").forEach(btn => {
-    btn.addEventListener("click", function() {
-      let handle = this.dataset.handle;
-      fetch(`/products/${handle}?view=popup`)
-        .then(res => res.text())
-        .then(html => {
-          popupBody.innerHTML = html;
-          popup.classList.remove("hidden");
-
-          // Add-to-cart logic
-          popupBody.querySelector("form").addEventListener("submit", function(e){
-            e.preventDefault();
-            let formData = new FormData(this);
-            fetch("/cart/add.js", {
-              method: "POST",
-              body: formData
-            }).then(r => r.json()).then(data => {
-              // Special rule: if Black + Medium -> also add Soft Winter Jacket
-              if(data.title.includes("Black") && data.title.includes("Medium")){
-                fetch("/cart/add.js", {
-                  method:"POST",
-                  headers: { "Content-Type":"application/json" },
-                  body: JSON.stringify({
-                    items: [{ id: {{ all_products['soft-winter-jacket'].variants.first.id }}, quantity:1 }]
-                  })
-                });
-              }
-              alert(data.title + " added to cart!");
-              popup.classList.add("hidden");
-            });
-          });
-        });
-    });
-  });
-
-  closeBtn.addEventListener("click", ()=> popup.classList.add("hidden"));
-  window.addEventListener("click", e => {
-    if(e.target === popup) popup.classList.add("hidden");
-  });
-});
-</script>
+{% schema %}
+{
+    "name": "Product Grid",
+    "settings": [
+        {
+            "type": "product_list",
+            "id": "products",
+            "label": "Select Products",
+            "info": "Select up to 6 products"
+        }
+    ]
+}
+{% endschema %}
