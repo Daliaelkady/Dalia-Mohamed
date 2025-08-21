@@ -1,114 +1,92 @@
+{% schema %}
+{
+  "name": "Custom Banner",
+  "settings": [
+    {
+      "type": "text",
+      "id": "brand_name",
+      "label": "Brand Name",
+      "default": "TISSO VISON"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Find the ideal gift for your loved ones."
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button Label",
+      "default": "CHOOSE GIFT"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button Link",
+      "default": "/collections/all"
+    }
+  ]
+}
+{% endschema %}
+
 <section class="custom-banner">
-  <div class="banner-top">
-    <h1 class="brand-name">{{ section.settings.brand_name }}</h1>
-    <p class="top-text">{{ section.settings.top_text }}</p>
-    <a href="{{ section.settings.top_button_link }}" class="top-button">
-      {{ section.settings.top_button_text }}
+  <div class="banner-container">
+    <span class="brand">{{ section.settings.brand_name }}</span>
+    <span class="tagline">{{ section.settings.tagline }}</span>
+    <a href="{{ section.settings.button_link }}" class="banner-btn">
+      {{ section.settings.button_label }}
+      <span class="arrow">→</span>
     </a>
-  </div>
-
-  <div class="banner-main">
-    <h2 class="main-title">{{ section.settings.main_title }}</h2>
-    <p class="main-text">{{ section.settings.main_text }}</p>
-    <a href="{{ section.settings.main_button_link }}" class="main-button">
-      {{ section.settings.main_button_text }}
-    </a>
-  </div>
-
-  <div class="banner-footer">
-    <p class="footer-text">{{ section.settings.footer_text }}</p>
   </div>
 </section>
 
 <style>
 .custom-banner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    height: 400px;
-    padding: 0 20px;
-    background-color:{{ section.settings.bg-color }};
-    color: {{ section.settings.text_color }};
-    transition: background 0.3s;
-}
-.custom-banner h1 {
-    font-size: 48px;
-    margin-bottom: 30px;
-}
-.custom-banner p {
-    font-size: 20px;
-    margin-bottom: 40px;
-}
-.custom-banner .btn {
-    display: inline-block;
-    background-color: {{ section.settings.button-bg }};
-    color: {{ section.settings.button_text_color }};
-    padding: 12px 30px;
-    border-radius: 8px;
-    font-weight: bold;
-    text-decoration: none;
-    transition: transform 0.3s, opacity 0.3s;
-}
-.custom-banner .btn:hover {
-    transform: translateY(-3px);
-    opacity: 0.85s;
-}
-@media(max-width: 768px){
-    .custom-banner h1{ font-size: 32px; }
-    .custom-banner p {font-size: 16px;}
-}
-.custom-banner {
-  text-align: center;
-  padding: 50px 20px;<style>
-  }
-.custom-banner {
-  text-align: center;
-  padding: 50px 20px;
-  background: url('{{ "banner-background.jpg" | asset_url }}') center/cover no-repeat;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e5e5e5;
+  background: #fff;
 }
 
-.top-button, .main-button {
-  display: inline-block;
-  padding: 10px 25px;
-  background-color: #ffeb3b;
-  color: #000;
-  text-decoration: none;
-  transition: all 0.3s ease;
-}
-
-.top-button:hover, .main-button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.brand-name, .main-title {
+.custom-banner .brand {
   font-weight: bold;
+  font-size: 1.2rem;
+  letter-spacing: 0.5px;
 }
 
-.banner-footer {
-  margin-top: 20px;
-  font-size: 12px;
+.custom-banner .tagline {
+  flex-grow: 1;
+  text-align: center;
+  font-size: 1rem;
   color: #555;
 }
-</style>
 
-
-{% schema %}
-{
-  "name": "Custom Banner",
-  "settings": [
-    { "type": "text", "id": "brand_name", "label": "Brand Name", "default": "TISSO VISON" },
-    { "type": "text", "id": "top_text", "label": "Top Text", "default": "Find the ideal gift for your loved ones." },
-    { "type": "text", "id": "top_button_text", "label": "Top Button Text", "default": "CHOOSE GIFT" },
-    
-
-    { "type": "text", "id": "main_title", "label": "Main Title", "default": "The Gift Guide" },
-    { "type": "textarea", "id": "main_text", "label": "Main Text", "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season." },
-    { "type": "text", "id": "main_button_text", "label": "Main Button Text", "default": "SHOP NOW" },
-   
-
-    { "type": "text", "id": "footer_text", "label": "Footer Text", "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL" }
-  ]
+.custom-banner .banner-btn {
+  background: #ffdd00;
+  color: #000;
+  padding: 0.8rem 1.2rem;
+  border-radius: 4px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
 }
-{% endschema %}
+
+.custom-banner .banner-btn:hover {
+  background: #ffc107;
+  transform: scale(1.05);
+}
+
+.custom-banner .banner-btn .arrow {
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.custom-banner .banner-btn:hover .arrow {
+  transform: translateX(5px);
+}
+</style>
