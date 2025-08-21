@@ -5,3 +5,32 @@
         <a href="{{ section.settings.button_link }}" class="btn">{{ section.settings.button_link }}</a>
     </div>
 </section>    
+
+<style>
+.custom-banner {
+    padding: 100px 20px;
+    text_align: center;
+    transition: background 0.3s;
+}
+.custom-banner h1 {
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+.custom-banner .btn {
+    display: inline-block;
+    background-color: {{ section.settings.button-bg }};
+    color: {{ section.settings.button_text_color }};
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: transform 0.3s, opacity 0.3s;
+}
+.custom-banner .btn:hover {
+    transform: translateY(-3px);
+    opacity: 0.85s;
+}
+@media(max-width: 768px){
+    .custom-banner h1{ font-size: 32px; }
+    .custom-banner p {font-size: 16px;}
+}
