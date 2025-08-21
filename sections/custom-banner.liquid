@@ -1,141 +1,37 @@
-<section class="custom-banner">
- 
-  <div class="content left">
-    <h2>{{ section.settings.brand_name }}</h2>
-    <h1>{{ section.settings.banner_heading }}</h1>
-    <a href="{{ section.settings.button_link }}" class="btn">{{ section.settings.button_label }}</a>
-  </div>
-</section>
-
-<section class="gift-guide">
-  <div class="content right">
-    <h2>{{ section.settings.gift_heading }}</h2>
-    <a href="{{ section.settings.gift_button_link }}" class="btn alt">{{ section.settings.gift_button_label }}</a>
-  </div>
-  
-</section>
+<div class="banner">
+    <h1>{{ section.settings.banner_title }}</h1>
+    <p>{{ section.settings.banner_description }}</p>
+    <button class="banner-button">{{ section.settings.button_text }}</button>
+</div>
 
 <style>
-/* === Layout === */
-.custom-banner, .gift-guide {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 40px 20px;
-}
-
-/* === Content area === */
-.custom-banner .content,
-.gift-guide .content {
-  max-width: 45%;
-}
-
-/* === Images === */
-.custom-banner .image,
-.gift-guide .image {
-  max-width: 45%;
-}
-.custom-banner img,
-.gift-guide img {
-  width: 100%;
-  height: auto;
-  border-radius: 10px;
-}
-
-/* === Typography === */
-.custom-banner h1 {
-  font-size: 28px;
-  margin: 10px 0;
-}
-.custom-banner h2 {
-  font-size: 16px;
-  color: #777;
-  text-transform: uppercase;
-}
-
-/* === Buttons === */
-.btn {
-  display: inline-block;
-  padding: 10px 20px;
-  background: #457b9d; /* Blue */
-  color: #fff;
-  text-decoration: none;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-.btn:hover {
-  background: #1d3557;
-}
-.btn.alt {
-  background: #e63946; /* Red */
-}
-.btn.alt:hover {
-  background: #b92b35;
-}
+    .banner {
+        /* Add your styles here */
+    }
+    .banner-button {
+        /* Add button styles and animations */
+    }
 </style>
 
 {% schema %}
 {
-  "name": "Banner + Gift",
-  "settings": [
-    {
-      "type": "text",
-      "id": "brand_name",
-      "label": "Brand Name",
-      "default": "Dalia DH"
-    },
-    {
-      "type": "text",
-      "id": "banner_heading",
-      "label": "Banner Heading",
-      "default": "Welcome to Dalia DH"
-    },
-    {
-      "type": "url",
-      "id": "button_link",
-      "label": "Banner Button Link",
-      "default": "/"
-    },
-    {
-      "type": "text",
-      "id": "button_label",
-      "label": "Banner Button Text",
-      "default": "Shop Now"
-    },
-    {
-      "type": "image_picker",
-      "id": "banner_image",
-      "label": "Banner Image"
-    },
-    {
-      "type": "text",
-      "id": "gift_heading",
-      "label": "Gift Heading",
-      "default": "Gift Guide"
-    },
-    {
-      "type": "url",
-      "id": "gift_button_link",
-      "label": "Gift Button Link",
-      "default": "/"
-    },
-    {
-      "type": "text",
-      "id": "gift_button_label",
-      "label": "Gift Button Text",
-      "default": "View Gift Guide"
-    },
-    {
-      "type": "image_picker",
-      "id": "gift_image",
-      "label": "Gift Image"
-    }
-  ],
-  "presets": [
-    {
-      "name": "Banner + Gift"
-    }
-  ]
+    "name": "Banner",
+    "settings": [
+        {
+            "type": "text",
+            "id": "banner_title",
+            "label": "Banner Title"
+        },
+        {
+            "type": "textarea",
+            "id": "banner_description",
+            "label": "Banner Description"
+        },
+        {
+            "type": "text",
+            "id": "button_text",
+            "label": "Button Text"
+        }
+    ]
 }
 {% endschema %}
