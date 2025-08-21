@@ -1,10 +1,24 @@
-<section class="custom-banner" style="background-color: {{ section.settings.bg_color}}; color: {{ section.settings.text_color }};">
-    <div class="banner-content">
-        <h1>{{ section.settings.title_text | default: "Welcome to Our Store" }}</h1>
-        <p>{{ section.settings.subtitle_text | default: "Discover our latest products!"}}</p>
-        <a href="{{ section.settings.button_link | default: "/collections/all" }}" class="btn">{{ section.settings.button_link }}</a>
-    </div>
-</section>    
+<section class="custom-banner">
+  <div class="banner-top">
+    <h1 class="brand-name">{{ section.settings.brand_name }}</h1>
+    <p class="top-text">{{ section.settings.top_text }}</p>
+    <a href="{{ section.settings.top_button_link }}" class="top-button">
+      {{ section.settings.top_button_text }}
+    </a>
+  </div>
+
+  <div class="banner-main">
+    <h2 class="main-title">{{ section.settings.main_title }}</h2>
+    <p class="main-text">{{ section.settings.main_text }}</p>
+    <a href="{{ section.settings.main_button_link }}" class="main-button">
+      {{ section.settings.main_button_text }}
+    </a>
+  </div>
+
+  <div class="banner-footer">
+    <p class="footer-text">{{ section.settings.footer_text }}</p>
+  </div>
+</section>
 
 <style>
 .custom-banner {
