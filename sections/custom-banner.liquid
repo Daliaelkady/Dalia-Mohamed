@@ -69,19 +69,9 @@
     <h1>{{ section.settings.banner_heading }}</h1>
     <a href="{{ section.settings.button_link }}" class="btn">{{ section.settings.button_label }}</a>
   </div>
-  <div class="image right">
-    {% if section.settings.banner_image != blank %}
-      <img src="{{ section.settings.banner_image | image_url: width: 600 }}" alt="Banner">
-    {% endif %}
-  </div>
 </section>
 
 <section class="gift-guide">
-  <div class="image left">
-    {% if section.settings.gift_image != blank %}
-      <img src="{{ section.settings.gift_image | image_url: width: 600 }}" alt="Gift">
-    {% endif %}
-  </div>
   <div class="content right">
     <h2>{{ section.settings.gift_heading }}</h2>
     <a href="{{ section.settings.gift_button_link }}" class="btn alt">{{ section.settings.gift_button_label }}</a>
