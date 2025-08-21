@@ -6,17 +6,12 @@
       <a href="{{ section.settings.button_link }}" class="btn-main">{{ section.settings.button_label }}</a>
       <p class="subtext">{{ section.settings.subtext }}</p>
     </div>
-    <div class="banner-image">
-      <img src="{{ section.settings.banner_image | image_url: 'master' }}" alt="Banner">
-    </div>
+   
   </div>
 </section>
 
 <section class="gift-guide">
   <div class="gift-container">
-    <div class="gift-image">
-      <img src="{{ section.settings.gift_image | image_url: 'master' }}" alt="Gift Guide">
-    </div>
     <div class="gift-text">
       <h2>{{ section.settings.gift_heading }}</h2>
       <p>{{ section.settings.gift_description }}</p>
@@ -32,9 +27,7 @@
 </section>
 
 <style>
-/* ===========================
-   CUSTOM BANNER (Left text, Right image)
-   =========================== */
+
 .custom-banner {
   padding: 5rem 2rem;
   background: #f5f5f5;
