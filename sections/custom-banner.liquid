@@ -1,15 +1,63 @@
 <div class="banner">
-    <h1>{{ section.settings.banner_title }}</h1>
-    <p>{{ section.settings.banner_description }}</p>
-    <button class="banner-button">{{ section.settings.button_text }}</button>
+    <div class="banner-content">
+        <h1>{{ section.settings.banner_title }}</h1>
+        <p>{{ section.settings.banner_description }}</p>
+        <button class="banner-button">{{ section.settings.button_text }}</button>
+    </div>
 </div>
 
 <style>
     .banner {
-        /* Add your styles here */
+        background-color: #f8f9fa; /* Light background color */
+        padding: 40px 20px; /* Padding around the banner */
+        text-align: center; /* Center align text */
+        position: relative; /* Position for button animation */
     }
+
+    .banner-content {
+        max-width: 800px; /* Max width for content */
+        margin: 0 auto; /* Center the content */
+    }
+
+    h1 {
+        font-size: 2.5em; /* Font size for the title */
+        color: #333; /* Dark text color */
+        margin-bottom: 20px; /* Space below the title */
+    }
+
+    p {
+        font-size: 1.2em; /* Font size for the description */
+        color: #666; /* Medium text color */
+        margin-bottom: 30px; /* Space below the description */
+    }
+
     .banner-button {
-        /* Add button styles and animations */
+        background-color: #007bff; /* Button background color */
+        color: white; /* Button text color */
+        border: none; /* No border */
+        padding: 15px 30px; /* Padding for the button */
+        font-size: 1em; /* Font size for the button */
+        cursor: pointer; /* Pointer cursor on hover */
+        transition: background-color 0.3s ease; /* Smooth transition for hover */
+        border-radius: 5px; /* Rounded corners */
+    }
+
+    .banner-button:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+    }
+
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2em; /* Smaller title on mobile */
+        }
+
+        p {
+            font-size: 1em; /* Smaller description on mobile */
+        }
+
+        .banner-button {
+            padding: 10px 20px; /* Smaller padding on mobile */
+        }
     }
 </style>
 
@@ -20,17 +68,20 @@
         {
             "type": "text",
             "id": "banner_title",
-            "label": "Banner Title"
+            "label": "Banner Title",
+            "default": "Welcome to Our Store!"
         },
         {
             "type": "textarea",
             "id": "banner_description",
-            "label": "Banner Description"
+            "label": "Banner Description",
+            "default": "Discover our exclusive products and offers."
         },
         {
             "type": "text",
             "id": "button_text",
-            "label": "Button Text"
+            "label": "Button Text",
+            "default": "Shop Now"
         }
     ]
 }
