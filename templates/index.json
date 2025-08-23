@@ -24,9 +24,61 @@
         "cta_link": "",
         "footer_text": "Consciously crafted fashion, made with care for people and the planet — available in sizes XXS to 6XL."
       }
+    },
+    "custom_grid_KHXJqQ": {
+      "type": "custom-grid",
+      "blocks": {
+        "product_TaWHji": {
+          "type": "product",
+          "settings": {
+            "product": "longsleeve-cotton-top"
+          }
+        },
+        "product_wygrdX": {
+          "type": "product",
+          "settings": {
+            "product": "dark-denim-top"
+          }
+        },
+        "product_AXTJgH": {
+          "type": "product",
+          "settings": {
+            "product": "ocean-blue-shirt"
+          }
+        },
+        "product_yEQqGW": {
+          "type": "product",
+          "settings": {
+            "product": "striped-silk-blouse"
+          }
+        },
+        "product_NChTcq": {
+          "type": "product",
+          "settings": {
+            "product": "navy-sport-jacket"
+          }
+        },
+        "product_JifhtN": {
+          "type": "product",
+          "settings": {
+            "product": "olive-green-jacket"
+          }
+        }
+      },
+      "block_order": [
+        "product_TaWHji",
+        "product_wygrdX",
+        "product_AXTJgH",
+        "product_yEQqGW",
+        "product_NChTcq",
+        "product_JifhtN"
+      ],
+      "name": "Product Grid Popup",
+      "settings": {}
     }
   },
   "order": [
-    "custom_banner_ABptyt"
+    "custom_banner_ABptyt",
+    "custom_grid_KHXJqQ"
   ]
 }
