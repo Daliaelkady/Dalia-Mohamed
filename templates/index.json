@@ -13,6 +13,7 @@
       "type": "custom-banner",
       "name": "Custom Banner with Popup",
       "settings": {
+        "background_image": "shopify://shop_images/black-and-blue-clothing-on-a-rack-in-a-sunlit-shop.jpg",
         "logo_text": "DALIA DH",
         "top_message": "Discover meaningful gifts that bring joy to the ones you cherish most.",
         "top_button_text": "CHOOSE GIFT",
