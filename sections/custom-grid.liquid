@@ -1,6 +1,6 @@
 {% schema %}
 {
-  "name": "Custom Product Grid",
+  "name": "CustomGridwithPopup",
   "settings": [],
   "blocks": [
     {
@@ -18,7 +18,8 @@
   "max_blocks": 6,
   "presets": [
     {
-      "name": "Custom Product Grid"
+      "name": "Custom Grid with Popup",
+      "category": "Custom"
     }
   ]
 }
@@ -28,72 +29,167 @@
   {% for block in section.blocks %}
     {% assign product = all_products[block.settings.product] %}
     {% if product %}
-      <div class="grid-item" data-product-handle="{{ product.handle }}">
+      <div class="grid-item" data-handle="{{ product.handle }}">
         <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}">
         <h3>{{ product.title }}</h3>
-        <p>{{ product.price | money }}</p>
+        <p class="price">{{ product.price | money }}</p>
         <button class="open-popup" data-handle="{{ product.handle }}">View Details</button>
       </div>
     {% endif %}
   {% endfor %}
 </div>
 
-<!-- Popup -->
-<div id="product-popup" class="popup-overlay hidden">
+<!-- Popup Modal -->
+<div id="product-popup" class="popup hidden">
   <div class="popup-content">
-    <span id="close-popup">&times;</span>
-    <div id="popup-details">
-      <!-- Product details load dynamically here -->
-    </div>
+    <span class="close-popup">&times;</span>
+    <div id="popup-body"></div>
   </div>
 </div>
 
 <style>
+/* Grid Styling */
 .custom-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 25px;
+  padding: 40px;
 }
+
 .grid-item {
-  text-align: center;
-  background: #f8f8f8;
-  padding: 15px;
-  border-radius: 12px;
-}
-.grid-item img {
-  width: 100%;
-  border-radius: 8px;
-}
-.popup-overlay {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999;
-}
-.popup-content {
   background: #fff;
   padding: 20px;
+  text-align: center;
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.grid-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+}
+.grid-item img {
+  max-width: 100%;
   border-radius: 12px;
-  max-width: 600px;
-  width: 100%;
 }
-#close-popup {
-  float: right;
-  font-size: 24px;
+.grid-item h3 {
+  margin: 12px 0 6px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.grid-item .price {
+  color: #444;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
+.grid-item button {
+  background: #111;
+  color: #fff;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease;
 }
-.hidden { display: none; }
+.grid-item button:hover {
+  background: #333;
+}
+
+/* Popup Overlay */
+.popup {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.popup.hidden { display: none; }
+
+/* Popup Content */
+.popup-content {
+  background: #fff;
+  padding: 30px;
+  width: 95%;
+  max-width: 500px;
+  border-radius: 16px;
+  position: relative;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  animation: fadeInUp 0.3s ease;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Close Button */
+.close-popup {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  color: #666;
+}
+.close-popup:hover {
+  color: #000;
+}
+
+/* Popup Body Styling */
+#popup-body h2 {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+#popup-body p {
+  margin-bottom: 14px;
+  line-height: 1.5;
+  color: #555;
+}
+#popup-body select {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+#popup-body button {
+  background: #111;
+  color: #fff;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  width: 100%;
+  transition: background 0.3s ease;
+}
+#popup-body button:hover {
+  background: #333;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+  .custom-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    padding: 20px;
+  }
+  .popup-content {
+    padding: 20px;
+  }
+}
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   const popup = document.getElementById("product-popup");
-  const popupDetails = document.getElementById("popup-details");
-  const closeBtn = document.getElementById("close-popup");
+  const popupBody = document.getElementById("popup-body");
+  const closeBtn = document.querySelector(".close-popup");
 
   // Open popup
   document.querySelectorAll(".open-popup").forEach(btn => {
@@ -101,68 +197,47 @@ document.addEventListener("DOMContentLoaded", () => {
       const handle = btn.dataset.handle;
 
       // Fetch product JSON
-      const response = await fetch(`/products/${handle}.js`);
-      const product = await response.json();
+      const res = await fetch(`/products/${handle}.js`);
+      const product = await res.json();
 
-      // Build popup HTML
-      let variantsHTML = "";
-      product.options.forEach((option, i) => {
-        variantsHTML += `
-          <label>${option.name}</label>
-          <select id="option-${i}">
-            ${option.values.map(v => `<option value="${v}">${v}</option>`).join("")}
-          </select>
-        `;
+      // Build variants dropdown
+      let variantOptions = "";
+      product.variants.forEach(v => {
+        variantOptions += `<option value="${v.id}">${v.title} - ${Shopify.formatMoney(v.price)}</option>`;
       });
 
-      popupDetails.innerHTML = `
+      // Insert details
+      popupBody.innerHTML = `
         <h2>${product.title}</h2>
-        <p><strong>Price:</strong> ${ (product.price/100).toFixed(2) } ${Shopify.currency.active}</p>
+        <p><strong>Price:</strong> ${Shopify.formatMoney(product.price)}</p>
         <p>${product.description}</p>
-        ${variantsHTML}
-        <label>Quantity</label>
-        <input type="number" id="quantity" value="1" min="1">
-        <button id="add-to-cart" data-id="${product.variants[0].id}">Add to Cart</button>
+        <label><strong>Choose variant:</strong></label>
+        <select id="variant-select">${variantOptions}</select>
+        <button id="add-to-cart">Add to Cart</button>
       `;
 
       // Show popup
       popup.classList.remove("hidden");
 
-      // Add to cart functionality
+      // Add to cart logic
       document.getElementById("add-to-cart").addEventListener("click", async () => {
-        const qty = document.getElementById("quantity").value;
-        let selectedOptions = [];
-        product.options.forEach((opt, i) => {
-          selectedOptions.push(document.getElementById(`option-${i}`).value);
-        });
+        const selectedVariant = document.getElementById("variant-select").value;
 
-        // Find correct variant
-        const selectedVariant = product.variants.find(v =>
-          v.options.every((opt, i) => opt === selectedOptions[i])
-        );
-
-        if (!selectedVariant) {
-          alert("Variant not found!");
-          return;
-        }
-
-        // Add main product
+        // Add chosen product
         await fetch("/cart/add.js", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: selectedVariant.id, quantity: parseInt(qty) })
+          body: JSON.stringify({ id: selectedVariant, quantity: 1 })
         });
 
-        // Special rule: If Black + Medium → also add Soft Winter Jacket
-        if (selectedOptions.includes("Black") && selectedOptions.includes("Medium")) {
-          const jacketHandle = "soft-winter-jacket"; // replace with actual handle
-          const jacketResp = await fetch(`/products/${jacketHandle}.js`);
-          const jacket = await jacketResp.json();
-          const jacketVariant = jacket.variants[0]; // default variant
+        // Special condition: if Black + Medium → add Soft Winter Jacket too
+        const chosenVariant = product.variants.find(v => v.id == selectedVariant);
+        if (chosenVariant && chosenVariant.title.includes("Black") && chosenVariant.title.includes("Medium")) {
+          const jacket = await fetch("/products/soft-winter-jacket.js`).then(r => r.json());
           await fetch("/cart/add.js", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id: jacketVariant.id, quantity: 1 })
+            body: JSON.stringify({ id: jacket.variants[0].id, quantity: 1 })
           });
         }
 
@@ -174,6 +249,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Close popup
   closeBtn.addEventListener("click", () => popup.classList.add("hidden"));
-  popup.addEventListener("click", e => { if (e.target === popup) popup.classList.add("hidden"); });
+  popup.addEventListener("click", (e) => {
+    if (e.target === popup) popup.classList.add("hidden");
+  });
 });
 </script>
