@@ -1,0 +1,503 @@
+{% comment %}
+  sections/custom-grid-with-popup.liquid
+  - Grid (6 product tiles configurable via blocks)
+  - Quick view popup with dynamic variants UI
+  - Add to Cart functionality (fetch -> /cart/add.js)
+  - Upsell auto-add: if Color="Black" AND Size="Medium" then add the upsell product (set in section setting)
+  - Vanilla JS only. Responsive. No jQuery.
+{% endcomment %}
+
+<section class="look-grid" aria-label="Look Grid Section">
+  <div class="look-grid__inner">
+    {% for block in section.blocks %}
+      {% assign p = all_products[block.settings.product] %}
+      {% if p %}
+        <button class="look-grid__tile" data-product-id="{{ p.id }}" aria-label="Open quick view for {{ p.title }}">
+          {% if p.featured_image %}
+            <img class="look-grid__img" src="{{ p.featured_image | image_url: width: 900 }}" alt="{{ p.title | escape }}" loading="lazy">
+          {% else %}
+            <div class="look-grid__placeholder">{{ p.title }}</div>
+          {% endif %}
+          <span class="look-grid__hotspot" aria-hidden="true">＋</span>
+        </button>
+      {% else %}
+        <!-- Empty block or product not found -->
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Popup (hidden by default) -->
+  <div class="look-popup" id="look-popup" hidden>
+    <div class="look-popup__box" role="dialog" aria-modal="true" aria-label="Product quick view">
+      <button class="look-popup__close" id="look-popup-close" aria-label="Close quick view">×</button>
+
+      <div class="look-popup__header">
+        <img class="look-popup__img" alt="" />
+        <div class="look-popup__meta">
+          <h3 class="look-popup__title"></h3>
+          <div class="look-popup__price" aria-live="polite"></div>
+          <p class="look-popup__desc"></p>
+        </div>
+      </div>
+
+      <div class="look-popup__options" id="look-popup-options"></div>
+
+      <form class="look-popup__form" id="look-popup-form">
+        <input type="hidden" name="id" id="look-popup-variant-id" value="">
+        <button type="submit" class="look-popup__add">ADD TO CART <span class="arrow">→</span></button>
+      </form>
+
+      <div class="look-popup__msg" id="look-popup-msg" aria-live="polite"></div>
+    </div>
+  </div>
+
+  <!-- Product data emitted for JS consumption -->
+  <script>
+    (function(){
+      // Build product payload (object keyed by product.id)
+      const PRODUCTS = {
+        {% assign _first = 'true' %}
+        {% for block in section.blocks %}
+          {% assign p = all_products[block.settings.product] %}
+          {% if p %}
+            {% if _first != 'true' %},{% endif %}
+            "{{ p.id }}": {
+              "id": "{{ p.id }}",
+              "handle": {{ p.handle | json }},
+              "title": {{ p.title | json }},
+              "description": {{ p.description | strip_html | json }},
+              "featured_image": {{ p.featured_image | image_url: width: 800 | json }},
+              "price_min": {{ p.price_min | default: 0 }},
+              "price_min_text": {{ p.price_min | money | json }},
+              "price_max": {{ p.price_max | default: 0 }},
+              "price_max_text": {{ p.price_max | money | json }},
+              "options": {{ p.options | json }},
+              "variants": [
+                {% for v in p.variants %}
+                  {
+                    "id": "{{ v.id }}",
+                    "title": {{ v.title | json }},
+                    "available": {{ v.available | json }},
+                    "price": {{ v.price }},
+                    "price_text": {{ v.price | money | json }},
+                    "option1": {{ v.option1 | json }},
+                    "option2": {{ v.option2 | json }},
+                    "option3": {{ v.option3 | json }}
+                  }{% unless forloop.last %},{% endunless %}
+                {% endfor %}
+              ]
+            }
+            {% assign _first = 'false' %}
+          {% endif %}
+        {% endfor %}
+      };
+
+      // Upsell product: store handle and first variant id (if set)
+      const UPSELL_PRODUCT_HANDLE = {{ section.settings.upsell_product | json }};
+      {% if section.settings.upsell_product != blank %}
+        {% assign upsell = all_products[section.settings.upsell_product] %}
+        {% if upsell %}
+          const UPSELL_FIRST_VARIANT_ID = {{ upsell.variants.first.id }};
+        {% else %}
+          const UPSELL_FIRST_VARIANT_ID = null;
+        {% endif %}
+      {% else %}
+        const UPSELL_FIRST_VARIANT_ID = null;
+      {% endif %}
+
+      window.__LOOK_PRODUCTS__ = PRODUCTS;
+      window.__LOOK_UPSELL_HANDLE__ = UPSELL_PRODUCT_HANDLE;
+      window.__LOOK_UPSELL_VARIANT_ID__ = UPSELL_FIRST_VARIANT_ID;
+    })();
+  </script>
+</section>
+
+<style>
+/* Grid layout */
+.look-grid { padding: 28px 20px; }
+.look-grid__inner {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.look-grid__tile {
+  position: relative;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  display: block;
+  line-height: 0;
+}
+.look-grid__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  aspect-ratio: 4/3;
+  display: block;
+  border-radius: 6px;
+}
+.look-grid__placeholder {
+  background: #f6f6f6;
+  aspect-ratio: 4/3;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  color: #222;
+  font-weight: 600;
+  padding: 20px;
+}
+.look-grid__hotspot {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: #fff;
+  color: #111;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  box-shadow: 0 4px 10px rgba(0,0,0,.12);
+  transition: transform .14s ease;
+}
+.look-grid__tile:hover .look-grid__hotspot { transform: scale(1.06); }
+
+/* Popup */
+.look-popup {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.56);
+  display: grid; place-items: center;
+  z-index: 9999;
+}
+.look-popup[hidden] { display: none; }
+.look-popup__box {
+  width: min(680px, 96vw);
+  background: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.18);
+}
+.look-popup__close {
+  position: absolute; right: 18px; top: 14px;
+  background: transparent; border: none; font-size: 22px; cursor: pointer;
+}
+.look-popup__header { display: grid; grid-template-columns: 128px 1fr; gap: 14px; align-items: start; }
+.look-popup__img { width: 128px; height: 128px; object-fit: cover; border-radius: 6px; background: #fafafa; }
+.look-popup__title { margin: 0; font-size: 20px; font-weight: 700; }
+.look-popup__price { font-weight: 700; margin: 8px 0; }
+.look-popup__desc { margin: 0; color: #4a4a4a; font-size: 14px; }
+
+/* Options UI */
+.look-popup__options { margin-top: 14px; display: grid; gap: 12px; }
+.look-option__label { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+.look-option__row { display: flex; gap: 8px; flex-wrap: wrap; }
+.look-chip {
+  min-width: 86px;
+  padding: 10px 12px;
+  border: 2px solid #d8d8d8;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all .14s ease;
+}
+.look-chip[aria-pressed="true"] {
+  border-color: #111;
+  box-shadow: inset 0 0 0 1px #111;
+}
+.look-select { width: 100%; padding: 10px 12px; border: 1px solid #d8d8d8; border-radius: 6px; }
+
+/* Add to cart */
+.look-popup__form { margin-top: 16px; }
+.look-popup__add {
+  width: 100%;
+  background: #111; color: #fff;
+  border: 0; border-radius: 8px;
+  padding: 12px 14px; font-weight: 800; letter-spacing: .02em;
+  cursor: pointer; transition: transform .08s ease, opacity .12s ease;
+}
+.look-popup__add:hover { transform: translateY(-2px); opacity: .98; }
+.look-popup__msg { margin-top: 8px; font-size: 13px; color: #0a7a38; min-height: 18px; }
+
+/* Responsive */
+@media (max-width: 980px) {
+  .look-grid__inner { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+  .look-popup__header { grid-template-columns: 92px 1fr; }
+  .look-popup__img { width: 92px; height: 92px; }
+}
+@media (max-width: 520px) {
+  .look-grid__inner { grid-template-columns: 1fr 1fr; gap: 12px; }
+  .look-popup__box { padding: 16px; }
+  .look-popup__header { grid-template-columns: 72px 1fr; gap: 10px; }
+}
+</style>
+
+<script>
+(() => {
+  // Access DOM
+  const section = document.currentScript ? document.currentScript.closest('.look-grid') : document.querySelector('.look-grid');
+  if (!section) return;
+
+  const popup = section.querySelector('#look-popup');
+  const popupBox = popup.querySelector('.look-popup__box');
+  const closeBtn = popup.querySelector('#look-popup-close');
+  const popupImg = popup.querySelector('.look-popup__img');
+  const popupTitle = popup.querySelector('.look-popup__title');
+  const popupPrice = popup.querySelector('.look-popup__price');
+  const popupDesc = popup.querySelector('.look-popup__desc');
+  const popupOptions = popup.querySelector('#look-popup-options');
+  const popupForm = popup.querySelector('#look-popup-form');
+  const variantInput = popup.querySelector('#look-popup-variant-id');
+  const msgEl = popup.querySelector('#look-popup-msg');
+
+  // Data
+  const PRODUCTS = window.__LOOK_PRODUCTS__ || {};
+  const UPSELL_HANDLE = window.__LOOK_UPSELL_HANDLE__ || null;
+  const UPSELL_VARIANT_ID = window.__LOOK_UPSELL_VARIANT_ID__ || null;
+
+  // Helpers
+  function formatPriceText(product) {
+    if (product.price_min === product.price_max) return product.price_min_text || '';
+    return (product.price_min_text || '') + ' - ' + (product.price_max_text || '');
+  }
+
+  // Build unique option values from variants for an option index
+  function uniqOptionValues(product, optionIndex) {
+    const values = product.variants.map(v => v['option' + (optionIndex+1)]).filter(Boolean);
+    return Array.from(new Set(values));
+  }
+
+  // Find variant by chosen selections array (index-based)
+  function findVariantBySelections(product, selections) {
+    return product.variants.find(v => {
+      for (let i = 0; i < product.options.length; i++) {
+        const want = selections[i] ?? '';
+        const val = v['option' + (i+1)] ?? '';
+        if ((want || '') !== (val || '')) return false;
+      }
+      return true;
+    }) || product.variants[0];
+  }
+
+  // Open popup for productId (string)
+  let activeProduct = null;
+  let currentSelections = [];
+
+  function openPopup(productId) {
+    const product = PRODUCTS[String(productId)];
+    if (!product) return console.warn('Product payload missing for id', productId);
+
+    activeProduct = product;
+    currentSelections = [];
+
+    popupImg.src = product.featured_image || '';
+    popupImg.alt = product.title || '';
+    popupTitle.textContent = product.title || '';
+    popupPrice.textContent = formatPriceText(product);
+    popupDesc.textContent = product.description || '';
+
+    // build options UI
+    popupOptions.innerHTML = '';
+    if (Array.isArray(product.options) && product.options.length) {
+      product.options.forEach((optName, idx) => {
+        const values = uniqOptionValues(product, idx);
+        const block = document.createElement('div');
+        block.className = 'look-option';
+        const label = document.createElement('div');
+        label.className = 'look-option__label';
+        label.textContent = optName;
+        const row = document.createElement('div');
+        row.className = 'look-option__row';
+
+        if (values.length <= 6) {
+          values.forEach((val, i) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'look-chip';
+            btn.textContent = val;
+            btn.setAttribute('data-opt-index', idx);
+            btn.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
+
+            btn.addEventListener('click', () => {
+              // unpress siblings
+              row.querySelectorAll('.look-chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
+              btn.setAttribute('aria-pressed', 'true');
+              currentSelections[idx] = val;
+              updateVariantSelectionUI();
+            });
+
+            if (i === 0) currentSelections[idx] = val;
+            row.appendChild(btn);
+          });
+        } else {
+          const sel = document.createElement('select');
+          sel.className = 'look-select';
+          values.forEach((val, i) => {
+            const o = document.createElement('option');
+            o.value = val; o.textContent = val;
+            sel.appendChild(o);
+            if (i === 0) currentSelections[idx] = val;
+          });
+          sel.addEventListener('change', () => {
+            currentSelections[idx] = sel.value;
+            updateVariantSelectionUI();
+          });
+          row.appendChild(sel);
+        }
+
+        block.appendChild(label);
+        block.appendChild(row);
+        popupOptions.appendChild(block);
+      });
+    } else {
+      // no options (single variant)
+      currentSelections = [];
+    }
+
+    // set chosen variant id
+    const chosen = findVariantBySelections(product, currentSelections);
+    variantInput.value = chosen.id;
+
+    // show popup
+    popup.hidden = false;
+    // focus for accessibility
+    setTimeout(() => closeBtn.focus(), 10);
+
+    // clear messages
+    msgEl.textContent = '';
+  }
+
+  function updateVariantSelectionUI() {
+    if (!activeProduct) return;
+    const chosen = findVariantBySelections(activeProduct, currentSelections);
+    variantInput.value = chosen.id;
+    // Optionally update price if variant has different price
+    const vPriceText = chosen.price_text || '';
+    if (vPriceText) popupPrice.textContent = vPriceText;
+  }
+
+  // Close popup
+  function closePopup() {
+    popup.hidden = true;
+    msgEl.textContent = '';
+  }
+
+  // Attach tile click handlers
+  section.querySelectorAll('.look-grid__tile').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pid = btn.getAttribute('data-product-id');
+      openPopup(pid);
+    });
+  });
+
+  // Close handlers
+  closeBtn.addEventListener('click', closePopup);
+  popup.addEventListener('click', (e) => { if (e.target === popup) closePopup(); });
+  document.addEventListener('keydown', (e) => { if (!popup.hidden && e.key === 'Escape') closePopup(); });
+
+  // Add to cart handler
+  popupForm.addEventListener('submit', async (ev) => {
+    ev.preventDefault();
+    const variantId = variantInput.value;
+    if (!variantId) {
+      msgEl.textContent = 'Please choose an option.';
+      return;
+    }
+
+    // prepare ajax add
+    const addToCart = async (id, qty = 1) => {
+      const res = await fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ id: Number(id), quantity: Number(qty) })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(()=>({ message: 'Add to cart failed' }));
+        throw new Error(err.description || err.message || 'Add to cart failed');
+      }
+      return res.json();
+    };
+
+    try {
+      // add selected product variant
+      await addToCart(variantId, 1);
+
+      // check upsell rule: Color == "Black" AND Size == "Medium"
+      // We must detect which options correspond to color/size for the active product
+      const prod = activeProduct;
+      if (prod && prod.options && prod.variants) {
+        // find selected values for color & size
+        let colorVal = null, sizeVal = null;
+        // find index for color-like and size-like option names
+        const idxColor = prod.options.findIndex(n => String(n || '').toLowerCase().includes('color') || String(n || '').toLowerCase().includes('colour'));
+        const idxSize = prod.options.findIndex(n => String(n || '').toLowerCase().includes('size'));
+        if (idxColor !== -1) colorVal = currentSelections[idxColor] || '';
+        if (idxSize !== -1) sizeVal = currentSelections[idxSize] || '';
+
+        if ((String(colorVal || '').toLowerCase() === 'black') && (String(sizeVal || '').toLowerCase() === 'medium')) {
+          // add upsell product: prefer the variant id pre-computed from settings (UPSELL_VARIANT_ID)
+          if (UPSELL_VARIANT_ID) {
+            try {
+              await addToCart(UPSELL_VARIANT_ID, 1);
+            } catch (e) {
+              console.warn('Adding upsell failed', e);
+            }
+          } else {
+            // fallback: try to find in PRODUCTS by title 'Soft Winter Jacket' (case-insensitive)
+            const fallback = Object.values(PRODUCTS).find(p => String(p.title || '').toLowerCase().trim() === 'soft winter jacket');
+            if (fallback && fallback.variants && fallback.variants.length) {
+              const fVar = fallback.variants.find(v=>v.available) || fallback.variants[0];
+              try { await addToCart(fVar.id, 1); } catch(e) { console.warn('Fallback upsell add failed', e); }
+            }
+          }
+        }
+      }
+
+      msgEl.style.color = '#0a7a38';
+      msgEl.textContent = 'Added to cart ✓';
+    } catch (err) {
+      msgEl.style.color = '#b00020';
+      msgEl.textContent = 'Could not add to cart. Please try again.';
+      console.error(err);
+    }
+  });
+
+})();
+</script>
+
+{% schema %}
+{
+  "name": "Look Grid with Popup",
+  "settings": [
+    {
+      "type": "product",
+      "id": "upsell_product",
+      "label": "Upsell product (auto-added when Color=Black & Size=Medium)",
+      "info": "Optional: select the 'Soft Winter Jacket' (or any product). If left empty the code tries fallback by title 'Soft Winter Jacket'."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "tile",
+      "name": "Product Tile",
+      "limit": 6,
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Look Grid with Popup",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
