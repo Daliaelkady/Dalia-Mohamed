@@ -11,13 +11,13 @@
       "type": "text",
       "id": "logo_text",
       "label": "Logo Text",
-      "default": "TISSO VISON"
+      "default": "TISSO VISION"
     },
     {
       "type": "text",
       "id": "top_message",
       "label": "Top Message",
-      "default": "Find the ideal gift for your loved ones."
+      "default": "Find the perfect gift to surprise your loved ones."
     },
     {
       "type": "text",
@@ -41,7 +41,7 @@
       "type": "textarea",
       "id": "subtitle",
       "label": "Subtitle",
-      "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+      "default": "Celebrate the season with our exclusive Holiday Gift Guide. From timeless classics to unique treasures, find thoughtful gifts that bring joy to everyone on your list."
     },
     {
       "type": "text",
@@ -58,7 +58,7 @@
       "type": "text",
       "id": "footer_text",
       "label": "Footer Text",
-      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+      "default": "Consciously crafted fashion for every body – sizes XXS to 6XL"
     }
   ],
   "presets": [
@@ -70,7 +70,6 @@
 {% endschema %}
 
 <section class="custom-banner" style="background-image: url({{ section.settings.background_image | image_url }});">
-  <!-- Top bar -->
   <div class="banner-top">
     <div class="logo">{{ section.settings.logo_text }}</div>
     <div class="top-message">{{ section.settings.top_message }}</div>
@@ -79,7 +78,6 @@
     </button>
   </div>
 
-  <!-- Center content -->
   <div class="banner-content">
     <h1 class="banner-title">{{ section.settings.title }}</h1>
     <p class="banner-subtitle">{{ section.settings.subtitle }}</p>
@@ -88,7 +86,6 @@
     </a>
   </div>
 
-  <!-- Footer -->
   <div class="banner-footer">
     {{ section.settings.footer_text }}
   </div>
@@ -116,44 +113,43 @@
   justify-content: space-between;
   padding: 20px;
   box-sizing: border-box;
+  color: #111;
+  font-family: 'Arial', sans-serif;
 }
 
-/* Top bar */
 .banner-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 20px;
 }
 
 .logo {
-  font-size: 22px;
-  font-weight: bold;
-  text-transform: uppercase;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1px;
 }
 
 .top-message {
   flex: 1;
   text-align: center;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 500;
 }
 
 .top-btn {
-  background: yellow;
-  padding: 10px 20px;
+  background: #FFD700;
+  padding: 10px 22px;
   font-weight: bold;
-  border-radius: 4px;
+  border-radius: 30px;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
 }
 .top-btn:hover {
-  background: black;
-  color: white;
+  background: #111;
+  color: #fff;
 }
 
-/* Center content */
 .banner-content {
   text-align: center;
   margin-top: auto;
@@ -161,38 +157,37 @@
 }
 
 .banner-title {
-  font-size: 52px;
-  font-weight: bold;
-  text-transform: uppercase;
+  font-size: 54px;
+  font-weight: 800;
+  margin-bottom: 15px;
 }
 
 .banner-subtitle {
-  max-width: 600px;
-  margin: 20px auto;
+  max-width: 650px;
+  margin: 0 auto 25px;
   font-size: 18px;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .cta-btn {
-  background: black;
-  color: white;
-  padding: 12px 24px;
+  background: #111;
+  color: #fff;
+  padding: 14px 28px;
   display: inline-block;
   text-decoration: none;
   font-weight: bold;
-  border-radius: 4px;
+  border-radius: 30px;
   transition: all 0.3s ease;
 }
 .cta-btn:hover {
   background: #333;
 }
 
-/* Footer */
 .banner-footer {
   text-align: center;
   font-size: 14px;
-  margin-top: 20px;
-  opacity: 0.9;
+  margin-top: 30px;
+  font-style: italic;
 }
 
 /* Popup */
@@ -209,9 +204,9 @@
 
 .popup-box {
   background: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  max-width: 500px;
+  padding: 35px;
+  border-radius: 12px;
+  max-width: 520px;
   width: 90%;
   position: relative;
   text-align: center;
@@ -220,10 +215,10 @@
 
 .popup-close {
   position: absolute;
-  top: 10px; right: 10px;
+  top: 12px; right: 12px;
   background: none;
   border: none;
-  font-size: 20px;
+  font-size: 24px;
   cursor: pointer;
 }
 
