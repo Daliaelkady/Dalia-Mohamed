@@ -1,616 +1,194 @@
-<!-- sections/grid-popup.liquid -->
-<section class="gp-section" aria-label="Product grid with quick view">
-
-  <!-- Grid -->
-  <div class="gp-grid">
-    {% for block in section.blocks %}
-      <div class="gp-tile">
-        {% if block.settings.product != blank %}
-          {% assign p = all_products[block.settings.product] %}
-          {% if p %}
-            <button class="gp-tile__btn" data-handle="{{ p.handle }}" aria-haspopup="dialog" aria-label="Open quick view for {{ p.title }}">
-              {% if p.featured_image %}
-                <img class="gp-tile__img" src="{{ p.featured_image | image_url: width: 800 }}" alt="{{ p.title | escape }}" loading="lazy">
-              {% else %}
-                <div class="gp-tile__placeholder">{{ p.title }}</div>
-              {% endif %}
-              <div class="gp-tile__meta">
-                <div class="gp-tile__title">{{ p.title }}</div>
-                <div class="gp-tile__price">{{ p.price | money }}</div>
-              </div>
-            </button>
-          {% else %}
-            <div class="gp-empty">Product not found</div>
-          {% endif %}
-        {% else %}
-          <div class="gp-placeholder">
-            <div class="gp-placeholder__text">Select a product in the editor</div>
-          </div>
-        {% endif %}
-      </div>
-    {% endfor %}
-  </div>
-
-  <!-- Popup (hidden by default) -->
-  <div id="gp-quickview" class="gp-quickview" aria-hidden="true" hidden>
-    <div class="gp-quickview__backdrop" tabindex="-1"></div>
-    <div class="gp-quickview__dialog" role="dialog" aria-modal="true" aria-label="Product quick view">
-      <button class="gp-quickview__close" aria-label="Close quick view">×</button>
-
-      <div class="gp-quickview__content">
-        <div class="gp-quickview__image-wrap">
-          <img class="gp-quickview__image" src="" alt="">
-        </div>
-
-        <div class="gp-quickview__info">
-          <h2 class="gp-quickview__title"></h2>
-          <div class="gp-quickview__price" aria-live="polite"></div>
-          <div class="gp-quickview__desc"></div>
-
-          <div class="gp-quickview__variants" aria-live="polite"></div>
-
-          <form class="gp-quickview__form" novalidate>
-            <input type="hidden" name="id" class="gp-variant-id" value="">
-            <button type="submit" class="gp-add-btn">ADD TO CART</button>
-          </form>
-
-          <div class="gp-msg" aria-live="polite"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</section>
-
-<style>
-/* -------------------------
-   Grid styles
-   ------------------------- */
-.gp-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 28px 16px;
-  box-sizing: border-box;
-}
-.gp-tile {
-  display: block;
-}
-.gp-tile__btn {
-  display: block;
-  width: 100%;
-  padding: 0;
-  background: #fff;
-  border: 0;
-  text-align: left;
-  cursor: pointer;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.gp-tile__btn:focus { outline: 2px solid #111; outline-offset: 3px; }
-.gp-tile__btn:hover { transform: translateY(-4px); box-shadow: 0 12px 30px rgba(0,0,0,0.12); }
-
-.gp-tile__img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  display: block;
-}
-.gp-tile__placeholder {
-  width: 100%;
-  height: 220px;
-  display: grid;
-  place-items: center;
-  background: #f6f6f6;
-  color: #666;
-}
-
-.gp-tile__meta {
-  padding: 12px 14px 18px;
-}
-.gp-tile__title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #111;
-  margin-bottom: 6px;
-}
-.gp-tile__price {
-  color: #444;
-  font-weight: 600;
-}
-
-/* Placeholder block when product not selected */
-.gp-placeholder {
-  background: linear-gradient(90deg,#fafafa,#f0f0f0);
-  border-radius: 12px;
-  padding: 36px 12px;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  color: #777;
-  border: 1px dashed #e6e6e6;
-}
-
-/* -------------------------
-   Quickview popup styles
-   ------------------------- */
-.gp-quickview {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: grid;
-  place-items: center;
-}
-.gp-quickview[hidden] { display: none; }
-
-/* backdrop */
-.gp-quickview__backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  z-index: 9999;
-}
-
-/* dialog */
-.gp-quickview__dialog {
-  position: relative;
-  z-index: 10000;
-  width: 94%;
-  max-width: 920px;
-  margin: 20px;
-  pointer-events: auto;
-  display: block;
-}
-.gp-quickview__content {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-  overflow: hidden;
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 18px;
-  padding: 18px;
-  box-sizing: border-box;
-  animation: gp-pop .22s ease;
-}
-@keyframes gp-pop { from { opacity: 0; transform: translateY(8px) scale(.995); } to { opacity:1; transform: translateY(0) scale(1); } }
-
-.gp-quickview__close {
-  position: absolute;
-  right: 12px;
-  top: 8px;
-  background: transparent;
-  border: 0;
-  font-size: 26px;
-  cursor: pointer;
-  z-index: 10001;
-}
-
-.gp-quickview__image-wrap {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.gp-quickview__image {
-  width: 100%;
-  max-width: 300px;
-  height: 300px;
-  object-fit: cover;
-  border-radius: 8px;
-  background: #fafafa;
-}
-
-/* info column */
-.gp-quickview__info {
-  padding: 6px 6px 0 6px;
-}
-.gp-quickview__title { font-size: 20px; margin: 6px 0; font-weight: 800; color: #111; }
-.gp-quickview__price { font-size: 18px; font-weight: 800; color: #111; margin-bottom: 10px; }
-.gp-quickview__desc { color: #444; font-size: 14px; line-height: 1.5; max-height: 160px; overflow:auto; margin-bottom: 10px; }
-
-/* variants UI */
-.gp-quickview__variants { margin-top: 6px; margin-bottom: 8px; display: grid; gap: 8px; }
-.gp-variant-group { display: grid; gap: 6px; }
-.gp-variant-label { font-weight: 700; color: #222; font-size: 13px; }
-.gp-variant-row { display:flex; gap:8px; flex-wrap:wrap; }
-
-/* chips for small sets */
-.gp-chip {
-  padding: 8px 12px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: #fff;
-  cursor: pointer;
-  font-size: 13px;
-}
-.gp-chip[aria-pressed="true"] { border-color: #111; box-shadow: inset 0 0 0 1px #111; }
-
-/* select fallback */
-.gp-select {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 14px;
-}
-
-/* add to cart */
-.gp-add-btn {
-  margin-top: 12px;
-  padding: 12px 14px;
-  background: #111;
-  color: #fff;
-  border: 0;
-  border-radius: 10px;
-  font-weight: 800;
-  width: 100%;
-  cursor: pointer;
-}
-.gp-add-btn:active { transform: translateY(1px); }
-
-.gp-msg {
-  margin-top: 10px;
-  min-height: 18px;
-  font-size: 14px;
-}
-
-/* responsive */
-@media (max-width: 980px) {
-  .gp-grid { grid-template-columns: repeat(2, 1fr); }
-  .gp-quickview__content { grid-template-columns: 220px 1fr; padding: 14px; }
-  .gp-quickview__image { height: 220px; max-width: 220px; }
-}
-@media (max-width: 620px) {
-  .gp-grid { grid-template-columns: 1fr 1fr; gap: 12px; padding: 16px; }
-  .gp-quickview__content { grid-template-columns: 1fr; gap: 12px; padding: 12px; }
-  .gp-quickview__image { height: 220px; max-width: 100%; }
-  .gp-quickview__info { padding: 0; }
-}
-</style>
-
-<script>
-/*
-  Grid + Quickview section script
-  - Uses vanilla JS
-  - Fetches product data via /products/{handle}.js
-  - Renders variants dynamically (chips or select)
-  - Adds to cart via /cart/add.js (AJAX)
-  - Special rule: if selected variant has Color="Black" AND Size="Medium", auto-add upsell product
-*/
-
-/* Liquid-rendered values for formatting and optional upsell */
-const SHOP_MONEY_FORMAT = {{ shop.money_format | json }};
-const SHOP_CURRENCY = {{ shop.currency | json }};
-// upsell variant id precomputed if user selected an upsell product in settings
-const UPSELL_VARIANT_ID = {% if section.settings.upsell_product != blank and all_products[section.settings.upsell_product] %}{{ all_products[section.settings.upsell_product].variants.first.id }}{% else %}null{% endif %};
-
-/* money formatting helper (uses Shopify.formatMoney if available) */
-function formatMoney(cents) {
-  if (window.Shopify && typeof Shopify.formatMoney === 'function') {
-    try { return Shopify.formatMoney(cents, SHOP_MONEY_FORMAT); } catch(e) { /* fallthrough */ }
-  }
-  // fallback: simple format
-  const n = (Number(cents) / 100).toFixed(2);
-  return n + ' ' + (SHOP_CURRENCY || '');
-}
-
-/* DOM references */
-const sectionEl = document.currentScript ? document.currentScript.closest('section.gp-section') : document.querySelector('section.gp-section');
-const quickview = document.getElementById('gp-quickview');
-const quickviewDialog = quickview.querySelector('.gp-quickview__dialog');
-const quickviewBackdrop = quickview.querySelector('.gp-quickview__backdrop');
-const closeBtn = quickview.querySelector('.gp-quickview__close');
-const imgEl = quickview.querySelector('.gp-quickview__image');
-const titleEl = quickview.querySelector('.gp-quickview__title');
-const priceEl = quickview.querySelector('.gp-quickview__price');
-const descEl = quickview.querySelector('.gp-quickview__desc');
-const variantsWrap = quickview.querySelector('.gp-quickview__variants');
-const variantIdInput = quickview.querySelector('.gp-variant-id');
-const formEl = quickview.querySelector('.gp-quickview__form');
-const addBtn = quickview.querySelector('.gp-add-btn');
-const msgEl = quickview.querySelector('.gp-msg');
-
-let activeProduct = null;   // product JSON from /products/{handle}.js
-let selections = [];        // current selections by option index
-
-/* Utility: fetch product JSON by handle */
-async function fetchProduct(handle) {
-  const res = await fetch(`/products/${handle}.js`, { credentials: 'same-origin' });
-  if (!res.ok) throw new Error('Failed loading product: ' + handle);
-  return res.json();
-}
-
-/* Build variants UI dynamically
-   - For each option: if <=6 values -> render chips, else a select
-   - selections[] is maintained: selections[index] = chosenValue
-*/
-function buildVariantsUI(product) {
-  variantsWrap.innerHTML = '';
-  selections = [];
-
-  const optCount = (product.options && product.options.length) ? product.options.length : 0;
-  if (optCount === 0) return;
-
-  product.options.forEach((optName, idx) => {
-    const values = Array.from(new Set(product.variants.map(v => v['option' + (idx+1)]).filter(Boolean)));
-
-    const group = document.createElement('div');
-    group.className = 'gp-variant-group';
-
-    const label = document.createElement('div');
-    label.className = 'gp-variant-label';
-    label.textContent = optName;
-
-    const row = document.createElement('div');
-    row.className = 'gp-variant-row';
-
-    if (values.length <= 6) {
-      // chips
-      values.forEach((val, i) => {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.className = 'gp-chip';
-        b.textContent = val;
-        b.setAttribute('data-opt-index', idx);
-        b.setAttribute('aria-pressed', i === 0 ? 'true' : 'false');
-        b.addEventListener('click', () => {
-          // unpress siblings
-          row.querySelectorAll('.gp-chip').forEach(c => c.setAttribute('aria-pressed','false'));
-          b.setAttribute('aria-pressed','true');
-          selections[idx] = val;
-          updateSelectedVariant(product);
-        });
-        row.appendChild(b);
-        if (i === 0) selections[idx] = val;
-      });
-    } else {
-      // select for many values
-      const sel = document.createElement('select');
-      sel.className = 'gp-select';
-      sel.setAttribute('data-opt-index', idx);
-      values.forEach((val, i) => {
-        const o = document.createElement('option'); o.value = val; o.textContent = val;
-        sel.appendChild(o);
-        if (i === 0) selections[idx] = val;
-      });
-      sel.addEventListener('change', () => {
-        selections[idx] = sel.value;
-        updateSelectedVariant(product);
-      });
-      row.appendChild(sel);
-    }
-
-    group.appendChild(label);
-    group.appendChild(row);
-    variantsWrap.appendChild(group);
-  });
-
-  // set initial variant id
-  updateSelectedVariant(product);
-}
-
-/* Find variant object matching current selections */
-function findVariant(product, selectionsArr) {
-  if (!product || !product.variants) return null;
-  return product.variants.find(v => {
-    for (let i = 0; i < (product.options || []).length; i++) {
-      const want = (selectionsArr[i] || '').toString();
-      const val = (v['option' + (i+1)] || '').toString();
-      if ((want || '') !== (val || '')) return false;
-    }
-    return true;
-  }) || product.variants[0];
-}
-
-/* Update the selected variant in UI (id & price) */
-function updateSelectedVariant(product) {
-  const variant = findVariant(product, selections);
-  if (!variant) return;
-  variantIdInput.value = variant.id;
-  // update price shown
-  priceEl.textContent = variant.price ? formatMoney(variant.price) : formatMoney(product.price);
-}
-
-/* Open quickview for a product handle */
-async function openQuickview(handle, triggerEl) {
-  try {
-    quickview.setAttribute('aria-hidden', 'false');
-    // fetch product JSON
-    const product = await fetchProduct(handle);
-    activeProduct = product;
-
-    // image
-    const imgUrl = product.featured_image || (product.images && product.images[0]) || '';
-    imgEl.src = imgUrl;
-    imgEl.alt = product.title || '';
-
-    // meta
-    titleEl.textContent = product.title || '';
-    // default price: if single price show product.price; else will update after variant selection
-    priceEl.textContent = product.price ? formatMoney(product.price) : '';
-    descEl.innerHTML = product.body_html ? product.body_html : (product.description || '');
-
-    // build variants
-    buildVariantsUI(product);
-
-    // ensure add button & form handler
-    msgEl.textContent = '';
-    variantIdInput.value = variantIdInput.value || (product.variants && product.variants[0] && product.variants[0].id) || '';
-
-    // show popup
-    quickview.hidden = false;
-    quickview.style.display = 'grid';
-    setTimeout(() => {
-      // focus close button for accessibility
-      closeBtn.focus();
-    }, 20);
-
-    // attach submit handler (we will remove previous handlers by cloning form)
-    attachFormHandler();
-  } catch (err) {
-    console.error('Quickview error:', err);
-    alert('Could not load product details. Please try again.');
-  }
-}
-
-/* Close quickview */
-function closeQuickview() {
-  try {
-    quickview.hidden = true;
-    quickview.style.display = 'none';
-    quickview.setAttribute('aria-hidden','true');
-    activeProduct = null;
-    selections = [];
-    variantsWrap.innerHTML = '';
-    msgEl.textContent = '';
-  } catch(e) { console.error(e); }
-}
-
-/* Attach form submit handler (safe: remove previous listeners to avoid duplication) */
-function attachFormHandler() {
-  // clone and replace form to remove previous listeners
-  const newForm = formEl.cloneNode(true);
-  formEl.parentNode.replaceChild(newForm, formEl);
-  // update references
-  const form = newForm;
-  const variantInputEl = form.querySelector('.gp-variant-id');
-  const msg = quickview.querySelector('.gp-msg');
-
-  form.addEventListener('submit', async (ev) => {
-    ev.preventDefault();
-    msg.textContent = '';
-    msg.style.color = '';
-
-    const variantId = variantInputEl.value;
-    if (!variantId) {
-      msg.style.color = '#b00020';
-      msg.textContent = 'Please choose a variant.';
-      return;
-    }
-
-    // Helper to add item to cart (AJAX)
-    async function addToCartAjax(id, qty = 1) {
-      const res = await fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ id: Number(id), quantity: Number(qty) })
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(()=>({ description: 'Add failed' }));
-        throw new Error(err.description || 'Add to cart failed');
-      }
-      return res.json();
-    }
-
-    try {
-      // 1) Add selected variant
-      await addToCartAjax(variantId, 1);
-
-      // 2) Check upsell rule: Color == Black AND Size == Medium
-      const prod = activeProduct;
-      if (prod && prod.options && prod.variants) {
-        // detect option indices
-        const idxColor = (prod.options || []).findIndex(o => String(o || '').toLowerCase().includes('color') || String(o || '').toLowerCase().includes('colour'));
-        const idxSize  = (prod.options || []).findIndex(o => String(o || '').toLowerCase().includes('size'));
-
-        let colorVal = '';
-        let sizeVal = '';
-
-        // find the variant object we added
-        const chosenVariant = prod.variants.find(v => String(v.id) === String(variantId));
-        if (chosenVariant) {
-          // variant option fields: option1, option2, option3
-          if (idxColor !== -1) colorVal = chosenVariant['option' + (idxColor+1)] || '';
-          if (idxSize  !== -1) sizeVal  = chosenVariant['option' + (idxSize+1)] || '';
-        }
-
-        if (String(colorVal).toLowerCase() === 'black' && String(sizeVal).toLowerCase() === 'medium') {
-          // add upsell product:
-          if (UPSELL_VARIANT_ID) {
-            try { await addToCartAjax(UPSELL_VARIANT_ID, 1); } catch(e){ console.warn('Upsell add failed', e); }
-          } else {
-            // fallback: try to fetch product by handle 'soft-winter-jacket' (case-insensitive search not possible here)
-            try {
-              const fallbackRes = await fetch('/products/soft-winter-jacket.js');
-              if (fallbackRes.ok) {
-                const fallbackProduct = await fallbackRes.json();
-                const fv = (fallbackProduct.variants && (fallbackProduct.variants.find(v => v.available) || fallbackProduct.variants[0]));
-                if (fv) await addToCartAjax(fv.id, 1);
-              }
-            } catch(e) { console.warn('Fallback upsell fetch failed', e); }
-          }
-        }
-      }
-
-      msg.style.color = '#0a7a38';
-      msg.textContent = 'Added to cart ✓';
-      // small delay then close
-      setTimeout(() => { closeQuickview(); }, 700);
-    } catch (err) {
-      console.error(err);
-      msg.style.color = '#b00020';
-      msg.textContent = 'Could not add to cart. Try again.';
-    }
-  });
-}
-
-/* Attach click handlers to tiles (delegated) */
-sectionEl.querySelectorAll('.gp-tile__btn').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    const handle = btn.getAttribute('data-handle');
-    if (!handle) return;
-    openQuickview(handle, btn);
-  });
-});
-
-/* Close handlers */
-closeBtn.addEventListener('click', closeQuickview);
-quickviewBackdrop.addEventListener('click', closeQuickview);
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !quickview.hidden) closeQuickview(); });
-
-</script>
-
 {% schema %}
 {
-  "name": "Custom Grid with Popup",
-  "settings": [
-    {
-      "type": "product",
-      "id": "upsell_product",
-      "label": "Upsell product (auto add when Color=Black & Size=Medium)",
-      "info": "Optional: select Soft Winter Jacket here. If left empty, code will attempt to add a product by handle 'soft-winter-jacket' as a fallback."
-    }
-  ],
+  "name": "Product Grid with Popup",
+  "settings": [],
   "blocks": [
     {
-      "type": "tile",
-      "name": "Product Tile",
-      "limit": 6,
+      "type": "product",
+      "name": "Product",
       "settings": [
         {
           "type": "product",
           "id": "product",
-          "label": "Product"
+          "label": "Select product"
         }
       ]
     }
   ],
+  "max_blocks": 6,
   "presets": [
     {
-      "name": "Custom Grid with Popup",
-      "category": "Custom",
-      "blocks": [
-        { "type": "tile" },
-        { "type": "tile" },
-        { "type": "tile" },
-        { "type": "tile" },
-        { "type": "tile" },
-        { "type": "tile" }
-      ]
+      "name": "Grid with Popup",
+      "category": "Custom"
     }
   ]
 }
 {% endschema %}
+
+<div class="product-grid">
+  {% for block in section.blocks %}
+    {% assign product = all_products[block.settings.product] %}
+    {% if product %}
+      <div class="product-card" data-handle="{{ product.handle }}">
+        <img src="{{ product.featured_image | img_url: '400x400' }}" alt="{{ product.title }}">
+        <h3>{{ product.title }}</h3>
+        <p>{{ product.price | money }}</p>
+        <button class="details-btn" data-handle="{{ product.handle }}">View Details</button>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<!-- Popup Modal -->
+<div id="product-popup" class="popup">
+  <div class="popup-content">
+    <span class="close-popup">&times;</span>
+    <div class="popup-body">
+      <img id="popup-image" src="" alt="">
+      <h2 id="popup-title"></h2>
+      <p id="popup-price"></p>
+      <p id="popup-description"></p>
+      <form id="variant-form"></form>
+      <button id="add-to-cart-btn">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+.product-card {
+  border: 1px solid #ddd;
+  padding: 15px;
+  text-align: center;
+  background: #fff;
+  border-radius: 10px;
+}
+.product-card img {
+  width: 100%;
+  border-radius: 8px;
+}
+.details-btn {
+  margin-top: 10px;
+  background: black;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+}
+.popup {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.7);
+}
+.popup-content {
+  background: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  width: 90%;
+  max-width: 600px;
+  border-radius: 12px;
+  position: relative;
+}
+.close-popup {
+  position: absolute;
+  top: 10px; right: 20px;
+  cursor: pointer;
+  font-size: 22px;
+}
+#add-to-cart-btn {
+  background: #000;
+  color: #fff;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  margin-top: 15px;
+  width: 100%;
+  cursor: pointer;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("product-popup");
+  const closePopup = document.querySelector(".close-popup");
+  const popupTitle = document.getElementById("popup-title");
+  const popupPrice = document.getElementById("popup-price");
+  const popupImage = document.getElementById("popup-image");
+  const popupDescription = document.getElementById("popup-description");
+  const variantForm = document.getElementById("variant-form");
+  const addToCartBtn = document.getElementById("add-to-cart-btn");
+
+  let selectedProduct = null;
+  let variants = [];
+
+  document.querySelectorAll(".details-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const handle = btn.getAttribute("data-handle");
+      const response = await fetch(`/products/${handle}.js`);
+      const product = await response.json();
+
+      selectedProduct = product;
+      variants = product.variants;
+
+      popupTitle.textContent = product.title;
+      popupPrice.textContent = Shopify.formatMoney(product.price);
+      popupImage.src = product.featured_image;
+      popupDescription.textContent = product.description;
+
+      variantForm.innerHTML = "";
+      variants.forEach(variant => {
+        const option = document.createElement("div");
+        option.innerHTML = `
+          <label>
+            <input type="radio" name="variant" value="${variant.id}">
+            ${variant.title} - ${Shopify.formatMoney(variant.price)}
+          </label>
+        `;
+        variantForm.appendChild(option);
+      });
+
+      popup.style.display = "block";
+    });
+  });
+
+  closePopup.addEventListener("click", () => popup.style.display = "none");
+
+  addToCartBtn.addEventListener("click", async () => {
+    const selectedVariantId = document.querySelector("input[name='variant']:checked")?.value;
+    if (!selectedVariantId) {
+      alert("Please select a variant");
+      return;
+    }
+
+    // Add main product to cart
+    await fetch("/cart/add.js", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: selectedVariantId, quantity: 1 })
+    });
+
+    // Auto add "Soft Winter Jacket" if Black + Medium is chosen
+    const chosenVariant = variants.find(v => v.id == selectedVariantId);
+    if (chosenVariant && chosenVariant.title.includes("Black") && chosenVariant.title.includes("Medium")) {
+      const jacket = await fetch("/products/soft-winter-jacket.js").then(res => res.json());
+      const jacketVariant = jacket.variants[0];
+      await fetch("/cart/add.js", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: jacketVariant.id, quantity: 1 })
+      });
+    }
+
+    alert("Added to cart!");
+    popup.style.display = "none";
+  });
+});
+</script>
