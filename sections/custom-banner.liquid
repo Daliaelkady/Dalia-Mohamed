@@ -71,15 +71,15 @@
 
 <section class="custom-banner" style="background-image: url({{ section.settings.background_image | image_url }});">
   <div class="banner-top fade-down">
-    <div class="logo">{{ section.settings.logo_text }}</div>
-    <div class="top-message">{{ section.settings.top_message }}</div>
+    <div class="logo">✦ {{ section.settings.logo_text }}</div>
+    <div class="top-message">★ {{ section.settings.top_message }}</div>
     <button class="top-btn" id="popup-trigger">
       {{ section.settings.top_button_text }} →
     </button>
   </div>
 
   <div class="banner-content">
-    <h1 class="banner-title fade-up">{{ section.settings.title }}</h1>
+    <h1 class="banner-title fade-up">✧ {{ section.settings.title }}</h1>
     <p class="banner-subtitle fade-up delay-1">{{ section.settings.subtitle }}</p>
     <a href="{{ section.settings.cta_link }}" class="cta-btn fade-up delay-2">
       {{ section.settings.cta_text }} →
@@ -87,7 +87,7 @@
   </div>
 
   <div class="banner-footer fade-up delay-3">
-    {{ section.settings.footer_text }}
+    ✦ {{ section.settings.footer_text }}
   </div>
 </section>
 
@@ -113,6 +113,7 @@
   justify-content: space-between;
   padding: 20px;
   box-sizing: border-box;
+  color: white; /* makes everything white */
 }
 
 /* Animations */
@@ -154,6 +155,7 @@
 }
 .top-btn {
   background: yellow;
+  color: black;
   padding: 10px 20px;
   font-weight: bold;
   border-radius: 4px;
