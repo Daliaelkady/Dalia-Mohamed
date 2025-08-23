@@ -1,6 +1,6 @@
 {% schema %}
 {
-  "name": "Custom Banner with Popup",
+  "name": "Custom Banner",
   "settings": [
     {
       "type": "image_picker",
@@ -9,236 +9,145 @@
     },
     {
       "type": "text",
-      "id": "logo_text",
-      "label": "Logo Text",
-      "default": "TISSO VISON"
-    },
-    {
-      "type": "text",
-      "id": "top_message",
-      "label": "Top Message",
-      "default": "Find the ideal gift for your loved ones."
-    },
-    {
-      "type": "text",
-      "id": "top_button_text",
-      "label": "Top Button Text",
-      "default": "CHOOSE GIFT"
+      "id": "headline",
+      "label": "Headline",
+      "default": "🎁 Celebrate the Season with Joy"
     },
     {
       "type": "textarea",
-      "id": "popup_content",
-      "label": "Popup Content",
-      "default": "Your popup message or HTML goes here!"
+      "id": "subheadline",
+      "label": "Subheadline",
+      "default": "Discover meaningful gifts that bring joy to the ones you cherish most."
     },
     {
       "type": "text",
-      "id": "title",
-      "label": "Main Title",
-      "default": "The Gift Guide"
-    },
-    {
-      "type": "textarea",
-      "id": "subtitle",
-      "label": "Subtitle",
-      "default": "Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season."
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "🌱 Consciously crafted fashion, made with care for people and the planet — available in sizes XXS to 6XL."
     },
     {
       "type": "text",
-      "id": "cta_text",
-      "label": "CTA Button Text",
-      "default": "SHOP NOW"
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "Shop Now"
     },
     {
       "type": "url",
-      "id": "cta_link",
-      "label": "CTA Button Link"
-    },
-    {
-      "type": "text",
-      "id": "footer_text",
-      "label": "Footer Text",
-      "default": "SUSTAINABLE, ETHICALLY MADE CLOTHES IN SIZES XXS TO 6XL"
+      "id": "button_link",
+      "label": "Button Link",
+      "default": "/collections/all"
     }
   ],
   "presets": [
     {
-      "name": "Custom Banner with Popup"
+      "name": "Custom Banner",
+      "category": "Custom Sections"
     }
   ]
 }
 {% endschema %}
 
-<section class="custom-banner" style="background-image: url({{ section.settings.background_image | image_url }});">
-  <div class="banner-top">
-    <div class="logo">{{ section.settings.logo_text }}</div>
-    <div class="top-message">{{ section.settings.top_message }}</div>
-    <button class="top-btn" id="popup-trigger">
-      {{ section.settings.top_button_text }} →
-    </button>
-  </div>
-
-  <div class="banner-content">
-    <h1 class="banner-title">{{ section.settings.title }}</h1>
-    <p class="banner-subtitle">{{ section.settings.subtitle }}</p>
-    <a href="{{ section.settings.cta_link }}" class="cta-btn">
-      {{ section.settings.cta_text }} →
+<section class="custom-banner">
+  <div class="custom-banner__overlay"></div>
+  <div class="custom-banner__content">
+    <h1>{{ section.settings.headline }}</h1>
+    <p class="subheadline">{{ section.settings.subheadline }}</p>
+    <p class="tagline">{{ section.settings.tagline }}</p>
+    <a href="{{ section.settings.button_link }}" class="banner-btn">
+      {{ section.settings.button_text }}
     </a>
-  </div>
-
-  <div class="banner-footer">
-    {{ section.settings.footer_text }}
   </div>
 </section>
 
-<!-- Popup -->
-<div class="popup-overlay" id="popup-overlay">
-  <div class="popup-box">
-    <button class="popup-close" id="popup-close">×</button>
-    <div class="popup-content">
-      {{ section.settings.popup_content }}
-    </div>
-  </div>
-</div>
-
 <style>
-.custom-banner {
-  position: relative;
-  width: 100%;
-  height: 100vh;
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 20px;
-  box-sizing: border-box;
-}
+  .custom-banner {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background: url({{ section.settings.background_image | image_url }}) center/cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: white;
+    padding: 2rem;
+  }
 
-.banner-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+  .custom-banner__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+  }
 
-.logo {
-  font-size: 20px;
-  font-weight: bold;
-}
+  .custom-banner__content {
+    position: relative;
+    max-width: 800px;
+    z-index: 2;
+  }
 
-.top-message {
-  flex: 1;
-  text-align: center;
-  font-size: 14px;
-}
+  .custom-banner__content h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    animation: fadeInDown 1s ease-out;
+  }
 
-.top-btn {
-  background: yellow;
-  padding: 10px 20px;
-  font-weight: bold;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.top-btn:hover {
-  background: black;
-  color: white;
-}
+  .custom-banner__content .subheadline {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    animation: fadeInUp 1.2s ease-out;
+  }
 
-.banner-content {
-  text-align: center;
-  margin-top: auto;
-  margin-bottom: auto;
-}
+  .custom-banner__content .tagline {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    animation: fadeInUp 1.4s ease-out;
+  }
 
-.banner-title {
-  font-size: 48px;
-  font-weight: bold;
-}
+  .banner-btn {
+    display: inline-block;
+    background: #ff4d4d;
+    color: white;
+    padding: 0.9rem 2rem;
+    border-radius: 50px;
+    font-weight: bold;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    animation: bounceIn 1.6s ease-out;
+  }
 
-.banner-subtitle {
-  max-width: 600px;
-  margin: 20px auto;
-  font-size: 16px;
-}
+  .banner-btn:hover {
+    background: #e60023;
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  }
 
-.cta-btn {
-  background: black;
-  color: white;
-  padding: 12px 24px;
-  display: inline-block;
-  text-decoration: none;
-  font-weight: bold;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-.cta-btn:hover {
-  background: #333;
-}
+  @keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-.banner-footer {
-  text-align: center;
-  font-size: 14px;
-  margin-top: 20px;
-}
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
-/* Popup */
-.popup-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
+  @keyframes bounceIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    60% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); }
+  }
 
-.popup-box {
-  background: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  max-width: 500px;
-  width: 90%;
-  position: relative;
-  text-align: center;
-  animation: fadeIn 0.3s ease;
-}
-
-.popup-close {
-  position: absolute;
-  top: 10px; right: 10px;
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-</style>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-  var trigger = document.getElementById("popup-trigger");
-  var overlay = document.getElementById("popup-overlay");
-  var closeBtn = document.getElementById("popup-close");
-
-  trigger.addEventListener("click", function() {
-    overlay.style.display = "flex";
-  });
-
-  closeBtn.addEventListener("click", function() {
-    overlay.style.display = "none";
-  });
-
-  overlay.addEventListener("click", function(e) {
-    if(e.target === overlay) {
-      overlay.style.display = "none";
+  @media (max-width: 768px) {
+    .custom-banner__content h1 {
+      font-size: 2rem;
     }
-  });
-});
-</script>
+    .custom-banner__content .subheadline {
+      font-size: 1.1rem;
+    }
+    .custom-banner__content .tagline {
+      font-size: 0.9rem;
+    }
+  }
+</style>
