@@ -1,177 +1,6 @@
-<div class="custom-grid">
-  <div class="grid-container">
-    {% for block in section.blocks %}
-      {% if block.settings.product != blank %}
-        {% assign product = all_products[block.settings.product] %}
-        <div class="grid-item" data-handle="{{ product.handle }}" data-id="{{ product.id }}">
-          <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}">
-          <h3>{{ product.title }}</h3>
-          <p>{{ product.price | money }}</p>
-          <button class="open-popup" data-handle="{{ product.handle }}" data-id="{{ product.id }}">
-            View Details
-          </button>
-        </div>
-      {% else %}
-        <div class="grid-item placeholder">
-          <p>Select a product</p>
-        </div>
-      {% endif %}
-    {% endfor %}
-  </div>
-
-  <!-- Popup -->
-  <div id="product-popup" class="popup hidden">
-    <div class="popup-content">
-      <button class="close-popup">✖</button>
-      <div class="popup-body">
-        <h2 id="popup-title"></h2>
-        <p id="popup-price"></p>
-        <div id="popup-description"></div>
-        <select id="variant-select"></select>
-        <button type="button" id="add-to-cart">Add to Cart</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<style>
-.custom-grid {
-  padding: 40px;
-}
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-}
-.grid-item {
-  border: 1px solid #ddd;
-  padding: 15px;
-  text-align: center;
-  background: #fff;
-  border-radius: 8px;
-}
-.grid-item img {
-  max-width: 100%;
-  border-radius: 6px;
-}
-.grid-item h3 {
-  margin: 10px 0;
-}
-button.open-popup {
-  margin-top: 10px;
-  background: #000;
-  color: #fff;
-  border: none;
-  padding: 8px 14px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-.popup {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-.popup.hidden {
-  display: none;
-}
-.popup-content {
-  background: white;
-  padding: 20px;
-  width: 400px;
-  border-radius: 8px;
-}
-.close-popup {
-  float: right;
-  background: transparent;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-}
-</style>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const popup = document.getElementById("product-popup");
-  const closeBtn = popup.querySelector(".close-popup");
-  const addToCartBtn = document.getElementById("add-to-cart");
-
-  let selectedProductId = null;
-
-  document.querySelectorAll(".open-popup").forEach(btn => {
-    btn.addEventListener("click", () => {
-      selectedProductId = btn.dataset.id;
-
-      // Fill popup content dynamically
-      document.getElementById("popup-title").innerText = btn.parentElement.querySelector("h3").innerText;
-      document.getElementById("popup-price").innerText = btn.parentElement.querySelector("p").innerText;
-      document.getElementById("popup-description").innerText = "This is a sample description for " + btn.dataset.handle;
-
-      // Example variant dropdown (Color + Size)
-      const variantSelect = document.getElementById("variant-select");
-      variantSelect.innerHTML = `
-        <option value="Black-Medium">Black / Medium</option>
-        <option value="Black-Large">Black / Large</option>
-        <option value="Red-Small">Red / Small</option>
-      `;
-
-      popup.classList.remove("hidden");
-    });
-  });
-
-  closeBtn.addEventListener("click", () => {
-    popup.classList.add("hidden");
-  });
-
-  addToCartBtn.addEventListener("click", () => {
-    const selectedVariant = document.getElementById("variant-select").value;
-
-    // Add main product
-    fetch("/cart/add.js", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        id: selectedProductId,
-        quantity: 1
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      console.log("Main product added:", data);
-
-      // Special rule: If Black + Medium → also add Soft Winter Jacket
-      if (selectedVariant === "Black-Medium") {
-        // Replace this ID with actual variant ID of Soft Winter Jacket
-        const softWinterJacketVariantId = 1234567890;  
-
-        fetch("/cart/add.js", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            id: softWinterJacketVariantId,
-            quantity: 1
-          })
-        })
-        .then(r => r.json())
-        .then(extra => {
-          console.log("Soft Winter Jacket added:", extra);
-          alert("Product + Soft Winter Jacket added to cart!");
-        });
-      } else {
-        alert("Product added to cart!");
-      }
-
-      popup.classList.add("hidden");
-    });
-  });
-});
-</script>
-
 {% schema %}
 {
-  "name": "Grid with Popup",
+  "name": "Custom Product Grid",
   "settings": [],
   "blocks": [
     {
@@ -189,16 +18,162 @@ document.addEventListener("DOMContentLoaded", () => {
   "max_blocks": 6,
   "presets": [
     {
-      "name": "Product Grid Popup",
-      "blocks": [
-        { "type": "product" },
-        { "type": "product" },
-        { "type": "product" },
-        { "type": "product" },
-        { "type": "product" },
-        { "type": "product" }
-      ]
+      "name": "Custom Product Grid"
     }
   ]
 }
 {% endschema %}
+
+<div class="custom-grid">
+  {% for block in section.blocks %}
+    {% assign product = all_products[block.settings.product] %}
+    {% if product %}
+      <div class="grid-item" data-product-handle="{{ product.handle }}">
+        <img src="{{ product.featured_image | img_url: '400x' }}" alt="{{ product.title }}">
+        <h3>{{ product.title }}</h3>
+        <p>{{ product.price | money }}</p>
+        <button class="open-popup" data-handle="{{ product.handle }}">View Details</button>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<!-- Popup -->
+<div id="product-popup" class="popup-overlay hidden">
+  <div class="popup-content">
+    <span id="close-popup">&times;</span>
+    <div id="popup-details">
+      <!-- Product details load dynamically here -->
+    </div>
+  </div>
+</div>
+
+<style>
+.custom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+.grid-item {
+  text-align: center;
+  background: #f8f8f8;
+  padding: 15px;
+  border-radius: 12px;
+}
+.grid-item img {
+  width: 100%;
+  border-radius: 8px;
+}
+.popup-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+.popup-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 100%;
+}
+#close-popup {
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+.hidden { display: none; }
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("product-popup");
+  const popupDetails = document.getElementById("popup-details");
+  const closeBtn = document.getElementById("close-popup");
+
+  // Open popup
+  document.querySelectorAll(".open-popup").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const handle = btn.dataset.handle;
+
+      // Fetch product JSON
+      const response = await fetch(`/products/${handle}.js`);
+      const product = await response.json();
+
+      // Build popup HTML
+      let variantsHTML = "";
+      product.options.forEach((option, i) => {
+        variantsHTML += `
+          <label>${option.name}</label>
+          <select id="option-${i}">
+            ${option.values.map(v => `<option value="${v}">${v}</option>`).join("")}
+          </select>
+        `;
+      });
+
+      popupDetails.innerHTML = `
+        <h2>${product.title}</h2>
+        <p><strong>Price:</strong> ${ (product.price/100).toFixed(2) } ${Shopify.currency.active}</p>
+        <p>${product.description}</p>
+        ${variantsHTML}
+        <label>Quantity</label>
+        <input type="number" id="quantity" value="1" min="1">
+        <button id="add-to-cart" data-id="${product.variants[0].id}">Add to Cart</button>
+      `;
+
+      // Show popup
+      popup.classList.remove("hidden");
+
+      // Add to cart functionality
+      document.getElementById("add-to-cart").addEventListener("click", async () => {
+        const qty = document.getElementById("quantity").value;
+        let selectedOptions = [];
+        product.options.forEach((opt, i) => {
+          selectedOptions.push(document.getElementById(`option-${i}`).value);
+        });
+
+        // Find correct variant
+        const selectedVariant = product.variants.find(v =>
+          v.options.every((opt, i) => opt === selectedOptions[i])
+        );
+
+        if (!selectedVariant) {
+          alert("Variant not found!");
+          return;
+        }
+
+        // Add main product
+        await fetch("/cart/add.js", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: selectedVariant.id, quantity: parseInt(qty) })
+        });
+
+        // Special rule: If Black + Medium → also add Soft Winter Jacket
+        if (selectedOptions.includes("Black") && selectedOptions.includes("Medium")) {
+          const jacketHandle = "soft-winter-jacket"; // replace with actual handle
+          const jacketResp = await fetch(`/products/${jacketHandle}.js`);
+          const jacket = await jacketResp.json();
+          const jacketVariant = jacket.variants[0]; // default variant
+          await fetch("/cart/add.js", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: jacketVariant.id, quantity: 1 })
+          });
+        }
+
+        alert("Added to cart!");
+        popup.classList.add("hidden");
+      });
+    });
+  });
+
+  // Close popup
+  closeBtn.addEventListener("click", () => popup.classList.add("hidden"));
+  popup.addEventListener("click", e => { if (e.target === popup) popup.classList.add("hidden"); });
+});
+</script>
