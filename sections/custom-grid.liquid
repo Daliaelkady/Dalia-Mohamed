@@ -163,24 +163,28 @@ document.addEventListener("DOMContentLoaded", function() {
   const popupDetails = document.getElementById("popup-details");
   const addToCartBtn = document.getElementById("add-to-cart");
   const closePopup = document.getElementById("close-popup");
-  let selectedProductHandle = null;
+  let selectedProduct = null;
 
   // Open popup
   document.querySelectorAll(".open-popup").forEach(btn => {
     btn.addEventListener("click", function() {
-      selectedProductHandle = this.dataset.handle;
+      const handle = this.dataset.handle;
 
-      fetch(`/products/${selectedProductHandle}.js`)
+      fetch(`/products/${handle}.js`)
         .then(res => res.json())
         .then(product => {
+          selectedProduct = product; // keep full product object
           let variantOptions = "";
-          if (product.variants && product.variants.length > 0) {
+          if (product.variants && product.variants.length > 1) {
             variantOptions = `
               <label for="variant">Select variant:</label>
               <select id="variant-select">
                 ${product.variants.map(v => `<option value="${v.id}">${v.title} - ${(v.price/100).toFixed(2)} ${Shopify.currency.active}</option>`).join("")}
               </select>
             `;
+          } else {
+            // store single variant ID if no options
+            variantOptions = `<input type="hidden" id="variant-select" value="${product.variants[0].id}" />`;
           }
 
           popupDetails.innerHTML = `
@@ -197,21 +201,23 @@ document.addEventListener("DOMContentLoaded", function() {
   // Add to cart
   addToCartBtn.addEventListener("click", function() {
     const variantSelect = document.getElementById("variant-select");
-    let variantId = variantSelect ? variantSelect.value : null;
-    if (!variantId) { alert("Please select a variant"); return; }
+    if (!variantSelect) { alert("No variant found"); return; }
+    const variantId = variantSelect.value;
 
     fetch("/cart/add.js", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: variantId, quantity: 1 })
     })
+    .then(res => res.json())
     .then(() => {
       alert("Added to cart!");
       popup.classList.remove("active");
-    });
+    })
+    .catch(err => alert("Error adding to cart"));
   });
 
   // Close popup
   closePopup.addEventListener("click", () => popup.classList.remove("active"));
 });
-</script> make the cart functional wothiout touching anything else
+</script>
