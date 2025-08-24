@@ -50,18 +50,6 @@
   font-size: 1rem;
   color: #666;
 }
-.product-block .btn {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 10px 20px;
-  background: #ff6f61;
-  color: #fff;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: bold;
-  transition: background 0.3s;
-}
-.product-block .btn:hover { background: #ff3b2f; }
 
 /* Popup Styles */
 .popup {
@@ -195,7 +183,30 @@ document.addEventListener('DOMContentLoaded', function() {
           const form = document.querySelector('#popup-form');
           form.addEventListener('submit', function(e) {
             e.preventDefault();
-            const formData = new FormData(form);
+
+            // Find selected variant
+            let selectedVariantId;
+            if (product.variants.length > 1) {
+              const selects = form.querySelectorAll('select');
+              const chosenValues = Array.from(selects).map(s => s.value);
+
+              // Match chosen values with product variants
+              const selectedVariant = product.variants.find(v =>
+                chosenValues.every(val => Object.values(v).includes(val))
+              );
+              selectedVariantId = selectedVariant ? selectedVariant.id : null;
+            } else {
+              selectedVariantId = product.variants[0].id;
+            }
+
+            if (!selectedVariantId) {
+              alert("Please select a variant.");
+              return;
+            }
+
+            const formData = new FormData();
+            formData.append('id', selectedVariantId);
+            formData.append('quantity', 1);
 
             fetch('/cart/add.js', {
               method: 'POST',
@@ -204,6 +215,21 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
               alert(`${product.title} has been added to your cart!`);
+
+              // ✅ Special Rule: if "Black" + "Medium" variant, also add Soft Winter Jacket
+              if (data.title.includes("Black") && data.title.includes("Medium")) {
+                fetch('/cart/add.js', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    id: "REPLACE_WITH_SOFT_WINTER_JACKET_VARIANT_ID",
+                    quantity: 1
+                  })
+                }).then(() => {
+                  console.log("Soft Winter Jacket auto-added");
+                });
+              }
+
               popup.style.display = 'none';
             })
             .catch(err => console.error(err));
