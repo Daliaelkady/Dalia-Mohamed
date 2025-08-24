@@ -18,177 +18,212 @@
   "max_blocks": 6,
   "presets": [
     {
-      "name": "Grid with Popup",
-      "category": "Custom"
+      "name": "Product Grid with Popup"
     }
   ]
 }
 {% endschema %}
 
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    font-family: "Poppins", sans-serif;
+  }
+
+  .product-card {
+    border: 1px solid #eee;
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+    background: #fff;
+    cursor: pointer;
+    transition: transform 0.3s;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .product-card h3 {
+    font-weight: 600;
+    margin: 10px 0;
+  }
+
+  .popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+  }
+
+  .popup {
+    background: #fff;
+    border-radius: 16px;
+    max-width: 500px;
+    width: 90%;
+    padding: 24px;
+    position: relative;
+    font-family: "Poppins", sans-serif;
+  }
+
+  .popup h2 {
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .popup p {
+    margin: 6px 0;
+  }
+
+  .popup button.close-popup {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .variant-select {
+    margin: 12px 0;
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+  }
+
+  .add-to-cart {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    width: 100%;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s;
+  }
+
+  .add-to-cart:hover {
+    background: #444;
+  }
+
+  @media (max-width: 768px) {
+    .product-grid {
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+  }
+</style>
+
 <div class="product-grid">
   {% for block in section.blocks %}
     {% assign product = all_products[block.settings.product] %}
     {% if product %}
-      <div class="product-card" data-handle="{{ product.handle }}">
-        <img src="{{ product.featured_image | img_url: '400x400' }}" alt="{{ product.title }}">
+      <div class="product-card" 
+           data-handle="{{ product.handle }}" 
+           data-title="{{ product.title }}" 
+           data-price="{{ product.price | money }}" 
+           data-description="{{ product.description | escape }}">
+        <img src="{{ product.featured_image | img_url: '300x300' }}" alt="{{ product.title }}">
         <h3>{{ product.title }}</h3>
         <p>{{ product.price | money }}</p>
-        <button class="details-btn" data-handle="{{ product.handle }}">View Details</button>
+        <button class="details-btn">View Details</button>
       </div>
     {% endif %}
   {% endfor %}
 </div>
 
-<!-- Popup Modal -->
-<div id="product-popup" class="popup">
-  <div class="popup-content">
-    <span class="close-popup">&times;</span>
-    <div class="popup-body">
-      <img id="popup-image" src="" alt="">
-      <h2 id="popup-title"></h2>
-      <p id="popup-price"></p>
-      <p id="popup-description"></p>
-      <form id="variant-form"></form>
-      <button id="add-to-cart-btn">Add to Cart</button>
-    </div>
+<div class="popup-overlay" id="popupOverlay">
+  <div class="popup" id="popup">
+    <button class="close-popup">&times;</button>
+    <h2 id="popupTitle"></h2>
+    <p id="popupPrice"></p>
+    <p id="popupDescription"></p>
+    <select id="variantSelect" class="variant-select"></select>
+    <button id="addToCartBtn" class="add-to-cart">Add to Cart</button>
   </div>
 </div>
 
-<style>
-.product-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-}
-.product-card {
-  border: 1px solid #ddd;
-  padding: 15px;
-  text-align: center;
-  background: #fff;
-  border-radius: 10px;
-}
-.product-card img {
-  width: 100%;
-  border-radius: 8px;
-}
-.details-btn {
-  margin-top: 10px;
-  background: black;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  cursor: pointer;
-  border-radius: 6px;
-}
-.popup {
-  display: none;
-  position: fixed;
-  z-index: 9999;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
-}
-.popup-content {
-  background: #fff;
-  margin: 5% auto;
-  padding: 20px;
-  width: 90%;
-  max-width: 600px;
-  border-radius: 12px;
-  position: relative;
-}
-.close-popup {
-  position: absolute;
-  top: 10px; right: 20px;
-  cursor: pointer;
-  font-size: 22px;
-}
-#add-to-cart-btn {
-  background: #000;
-  color: #fff;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  margin-top: 15px;
-  width: 100%;
-  cursor: pointer;
-}
-</style>
-
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-  const popup = document.getElementById("product-popup");
-  const closePopup = document.querySelector(".close-popup");
-  const popupTitle = document.getElementById("popup-title");
-  const popupPrice = document.getElementById("popup-price");
-  const popupImage = document.getElementById("popup-image");
-  const popupDescription = document.getElementById("popup-description");
-  const variantForm = document.getElementById("variant-form");
-  const addToCartBtn = document.getElementById("add-to-cart-btn");
+  document.addEventListener("DOMContentLoaded", () => {
+    const overlay = document.getElementById("popupOverlay");
+    const popupTitle = document.getElementById("popupTitle");
+    const popupPrice = document.getElementById("popupPrice");
+    const popupDescription = document.getElementById("popupDescription");
+    const variantSelect = document.getElementById("variantSelect");
+    const addToCartBtn = document.getElementById("addToCartBtn");
+    let currentProductHandle = null;
+    let currentProductData = null;
 
-  let selectedProduct = null;
-  let variants = [];
+    // Open popup
+    document.querySelectorAll(".details-btn").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const card = e.target.closest(".product-card");
+        currentProductHandle = card.dataset.handle;
 
-  document.querySelectorAll(".details-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-      const handle = btn.getAttribute("data-handle");
-      const response = await fetch(`/products/${handle}.js`);
-      const product = await response.json();
+        // Fetch product JSON
+        const res = await fetch(`/products/${currentProductHandle}.js`);
+        currentProductData = await res.json();
 
-      selectedProduct = product;
-      variants = product.variants;
+        popupTitle.textContent = currentProductData.title;
+        popupPrice.textContent = Shopify.formatMoney(currentProductData.price, "{{ shop.money_format }}");
+        popupDescription.textContent = currentProductData.description;
 
-      popupTitle.textContent = product.title;
-      popupPrice.textContent = Shopify.formatMoney(product.price);
-      popupImage.src = product.featured_image;
-      popupDescription.textContent = product.description;
+        // Populate variants
+        variantSelect.innerHTML = "";
+        currentProductData.variants.forEach(v => {
+          let option = document.createElement("option");
+          option.value = v.id;
+          option.textContent = v.title;
+          variantSelect.appendChild(option);
+        });
 
-      variantForm.innerHTML = "";
-      variants.forEach(variant => {
-        const option = document.createElement("div");
-        option.innerHTML = `
-          <label>
-            <input type="radio" name="variant" value="${variant.id}">
-            ${variant.title} - ${Shopify.formatMoney(variant.price)}
-          </label>
-        `;
-        variantForm.appendChild(option);
+        overlay.style.display = "flex";
       });
-
-      popup.style.display = "block";
-    });
-  });
-
-  closePopup.addEventListener("click", () => popup.style.display = "none");
-
-  addToCartBtn.addEventListener("click", async () => {
-    const selectedVariantId = document.querySelector("input[name='variant']:checked")?.value;
-    if (!selectedVariantId) {
-      alert("Please select a variant");
-      return;
-    }
-
-    // Add main product to cart
-    await fetch("/cart/add.js", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: selectedVariantId, quantity: 1 })
     });
 
-    // Auto add "Soft Winter Jacket" if Black + Medium is chosen
-    const chosenVariant = variants.find(v => v.id == selectedVariantId);
-    if (chosenVariant && chosenVariant.title.includes("Black") && chosenVariant.title.includes("Medium")) {
-      const jacket = await fetch("/products/soft-winter-jacket.js").then(res => res.json());
-      const jacketVariant = jacket.variants[0];
+    // Close popup
+    document.querySelector(".close-popup").addEventListener("click", () => {
+      overlay.style.display = "none";
+    });
+
+    // Add to Cart
+    addToCartBtn.addEventListener("click", async () => {
+      const variantId = variantSelect.value;
+
+      // Add selected product
       await fetch("/cart/add.js", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: jacketVariant.id, quantity: 1 })
+        body: JSON.stringify({ id: variantId, quantity: 1 })
       });
-    }
 
-    alert("Added to cart!");
-    popup.style.display = "none";
+      // Check for condition (Black + Medium)
+      const selectedVariant = currentProductData.variants.find(v => v.id == variantId);
+      if (selectedVariant && selectedVariant.title.includes("Black") && selectedVariant.title.includes("Medium")) {
+        // Auto add "Soft Winter Jacket"
+        const jacket = await fetch("/products/soft-winter-jacket.js");
+        const jacketData = await jacket.json();
+        const jacketVariant = jacketData.variants[0];
+
+        await fetch("/cart/add.js", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: jacketVariant.id, quantity: 1 })
+        });
+      }
+
+      alert("Added to cart!");
+      overlay.style.display = "none";
+    });
   });
-});
 </script>
