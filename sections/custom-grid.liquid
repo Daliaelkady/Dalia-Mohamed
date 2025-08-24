@@ -129,52 +129,26 @@
 }
 </style>
 
-<div class="product-grid">
-  {% for i in (1..6) %}
-    {% capture setting_id %}product_{{ i }}{% endcapture %}
-    {% assign selected_handle = section.settings[setting_id] %}
-    {% assign product = all_products[selected_handle] %}
-
-    {% if product %}
-      <div class="product-card" data-product-handle="{{ product.handle }}">
-        {% if product.featured_image %}
-          <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-        {% endif %}
-        <h3>{{ product.title }}</h3>
-        <p>{{ product.price | money }}</p>
-        <button class="open-popup" data-handle="{{ product.handle }}">View Details</button>
-      </div>
-    {% endif %}
-  {% endfor %}
-</div>
-
-<!-- Popup -->
-<div id="product-popup">
-  <div class="popup-inner">
-    <button id="close-popup">✖</button>
-    <div id="popup-details">Loading...</div>
-    <button id="add-to-cart">Add to Cart</button>
-  </div>
-</div>
-
 <script>
 document.addEventListener("DOMContentLoaded", function() {
   const popup = document.getElementById("product-popup");
   const popupDetails = document.getElementById("popup-details");
   const addToCartBtn = document.getElementById("add-to-cart");
   const closePopup = document.getElementById("close-popup");
-  let selectedProductHandle = null;
+  let selectedProduct = null; // store full product object
 
   // Open popup
   document.querySelectorAll(".open-popup").forEach(btn => {
     btn.addEventListener("click", function() {
-      selectedProductHandle = this.dataset.handle;
+      const handle = this.dataset.handle;
 
-      fetch(`/products/${selectedProductHandle}.js`)
+      fetch(`/products/${handle}.js`)
         .then(res => res.json())
         .then(product => {
+          selectedProduct = product; // save product for later
+
           let variantOptions = "";
-          if (product.variants && product.variants.length > 0) {
+          if (product.variants && product.variants.length > 1) {
             variantOptions = `
               <label for="variant">Select variant:</label>
               <select id="variant-select">
@@ -198,17 +172,28 @@ document.addEventListener("DOMContentLoaded", function() {
   addToCartBtn.addEventListener("click", function() {
     const variantSelect = document.getElementById("variant-select");
     let variantId = variantSelect ? variantSelect.value : null;
-    if (!variantId) { alert("Please select a variant"); return; }
+
+    // fallback: if only 1 variant, take that
+    if (!variantId && selectedProduct && selectedProduct.variants.length === 1) {
+      variantId = selectedProduct.variants[0].id;
+    }
+
+    if (!variantId) {
+      alert("Please select a variant");
+      return;
+    }
 
     fetch("/cart/add.js", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: variantId, quantity: 1 })
     })
+    .then(res => res.json())
     .then(() => {
-      alert("Added to cart!");
+      alert("✅ Added to cart!");
       popup.classList.remove("active");
-    });
+    })
+    .catch(() => alert("❌ Error adding to cart"));
   });
 
   // Close popup
