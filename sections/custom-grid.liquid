@@ -1,13 +1,7 @@
 {% schema %}
 {
   "name": "Product Grid with Popup",
-  "settings": [
-    {
-      "type": "product",
-      "id": "upsell_product",
-      "label": "Upsell Product (e.g. Soft Winter Jacket)"
-    }
-  ],
+  "settings": [],
   "blocks": [
     {
       "type": "product",
@@ -24,168 +18,223 @@
   "max_blocks": 6,
   "presets": [
     {
-      "name": "Custom Product Grid"
+      "name": "Product Grid Popup",
+      "blocks": [
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" },
+        { "type": "product" }
+      ]
     }
   ]
 }
 {% endschema %}
 
-<div class="custom-grid">
+<div class="gp-grid">
   {% for block in section.blocks %}
-    {% if block.settings.product %}
-      {% assign product = all_products[block.settings.product] %}
-      <div class="grid-item">
-        <img src="{{ product.featured_image | image_url: width: 400 }}" alt="{{ product.title }}">
-        <h3>{{ product.title }}</h3>
-        <p>{{ product.price | money }}</p>
-        <button class="details-btn" data-handle="{{ product.handle }}">
-          View Details
-        </button>
+    {% assign p = all_products[block.settings.product] %}
+    {% if p %}
+      <div class="gp-tile" data-handle="{{ p.handle }}">
+        <div class="gp-tile__card">
+          {% if p.featured_image %}
+            <img class="gp-tile__img" src="{{ p.featured_image | image_url: width: 600 }}" alt="{{ p.title | escape }}">
+          {% endif %}
+          <div class="gp-tile__meta">
+            <div class="gp-tile__title">{{ p.title }}</div>
+            <div class="gp-tile__price">{{ p.price | money }}</div>
+          </div>
+        </div>
       </div>
     {% endif %}
   {% endfor %}
 </div>
 
 <!-- Popup -->
-<div id="product-popup" class="popup hidden">
-  <div class="popup-content">
-    <span id="popup-close">&times;</span>
-    <div id="popup-body">
-      <!-- Dynamic content will load here -->
+<div id="gp-popup" class="gp-popup">
+  <div class="gp-popup__content">
+    <span id="gp-popup-close" class="gp-popup__close">&times;</span>
+    <div class="gp-popup__body">
+      <img id="gp-popup-img" class="gp-popup__img" alt="">
+      <h2 id="gp-popup-title"></h2>
+      <p id="gp-popup-price"></p>
+      <p id="gp-popup-desc"></p>
+      <form id="gp-popup-form">
+        <div id="gp-popup-variants"></div>
+        <button type="submit" class="gp-btn">Add to Cart</button>
+      </form>
     </div>
   </div>
 </div>
 
 <style>
-.custom-grid {
+/* GRID */
+.gp-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
 }
-.grid-item {
-  border: 1px solid #ddd;
-  padding: 15px;
-  text-align: center;
-  background: #fff;
-  border-radius: 8px;
+.gp-tile {
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
-.grid-item img {
-  max-width: 100%;
+.gp-tile:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.gp-tile__img {
+  width: 100%;
   height: auto;
   border-radius: 8px;
 }
-.details-btn {
-  margin-top: 10px;
-  padding: 10px 15px;
-  background: black;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
+.gp-tile__meta {
+  padding: 8px 0;
+  text-align: center;
+  font-family: Arial, sans-serif;
 }
-.details-btn:hover {
-  background: #333;
-}
-.popup {
+
+/* POPUP */
+.gp-popup {
+  display: none;
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0,0,0,0.6);
-  display: flex;
+  z-index: 9999;
   justify-content: center;
   align-items: center;
 }
-.popup.hidden {
-  display: none;
-}
-.popup-content {
+.gp-popup__content {
   background: #fff;
   padding: 20px;
+  max-width: 500px;
   width: 90%;
-  max-width: 600px;
   border-radius: 10px;
   position: relative;
+  animation: fadeIn 0.3s ease;
 }
-#popup-close {
+.gp-popup__close {
   position: absolute;
   top: 10px;
   right: 15px;
   font-size: 24px;
   cursor: pointer;
 }
+.gp-popup__img {
+  width: 100%;
+  height: auto;
+  margin-bottom: 15px;
+  border-radius: 6px;
+}
+.gp-btn {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 15px;
+  background: #111;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+.gp-btn:hover { background: #333; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  const popup = document.getElementById("product-popup");
-  const popupBody = document.getElementById("popup-body");
-  const closeBtn = document.getElementById("popup-close");
+document.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("gp-popup");
+  const popupClose = document.getElementById("gp-popup-close");
+  const popupImg = document.getElementById("gp-popup-img");
+  const popupTitle = document.getElementById("gp-popup-title");
+  const popupPrice = document.getElementById("gp-popup-price");
+  const popupDesc = document.getElementById("gp-popup-desc");
+  const popupVariants = document.getElementById("gp-popup-variants");
+  const popupForm = document.getElementById("gp-popup-form");
 
-  document.querySelectorAll(".details-btn").forEach(btn => {
-    btn.addEventListener("click", function() {
-      const handle = this.getAttribute("data-handle");
+  // Open popup
+  document.querySelectorAll(".gp-tile").forEach(tile => {
+    tile.addEventListener("click", async () => {
+      const handle = tile.dataset.handle;
+      if (!handle) return;
 
-      // Fetch product JSON
-      fetch(`/products/${handle}.js`)
-        .then(res => res.json())
-        .then(product => {
-          let variantsHtml = '';
-          product.variants.forEach(v => {
-            variantsHtml += `<option value="${v.id}" data-title="${v.title}">${v.title} - ${Shopify.formatMoney(v.price)}</option>`;
+      const res = await fetch(`/products/${handle}.js`);
+      const product = await res.json();
+
+      popupTitle.textContent = product.title;
+      popupPrice.textContent = (product.price / 100).toFixed(2) + " " + Shopify.currency.active;
+      popupDesc.textContent = product.description.replace(/<[^>]*>?/gm, '');
+      popupImg.src = product.featured_image;
+
+      // Variants
+      popupVariants.innerHTML = "";
+      if (product.variants.length > 1) {
+        product.options.forEach((opt, idx) => {
+          const sel = document.createElement("select");
+          sel.name = "option" + (idx + 1);
+          product.options[idx].values.forEach(val => {
+            const o = document.createElement("option");
+            o.value = val;
+            o.textContent = val;
+            sel.appendChild(o);
           });
-
-          popupBody.innerHTML = `
-            <h2>${product.title}</h2>
-            <p>${Shopify.formatMoney(product.price)}</p>
-            <p>${product.description}</p>
-            <select id="variant-select">${variantsHtml}</select>
-            <button id="add-to-cart">Add to Cart</button>
-          `;
-
-          // Add to cart functionality
-          document.getElementById("add-to-cart").addEventListener("click", function() {
-            const selectedVariant = document.getElementById("variant-select").value;
-            const selectedTitle = document.getElementById("variant-select")
-              .options[document.getElementById("variant-select").selectedIndex]
-              .dataset.title;
-
-            // Add main product
-            fetch("/cart/add.js", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ id: selectedVariant, quantity: 1 })
-            })
-            .then(res => res.json())
-            .then(() => {
-              // Check special condition
-              if (selectedTitle.includes("Black") && selectedTitle.includes("Medium")) {
-                const upsell = "{{ section.settings.upsell_product }}";
-                if (upsell) {
-                  fetch(`/products/${upsell}.js`)
-                    .then(res => res.json())
-                    .then(upsellProd => {
-                      fetch("/cart/add.js", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id: upsellProd.variants[0].id, quantity: 1 })
-                      });
-                    });
-                }
-              }
-              alert("Product added to cart!");
-            });
-          });
-
-          popup.classList.remove("hidden");
+          popupVariants.appendChild(sel);
         });
+      }
+
+      popup.dataset.variants = JSON.stringify(product.variants);
+
+      popup.style.display = "flex";
     });
   });
 
-  closeBtn.addEventListener("click", () => popup.classList.add("hidden"));
-  popup.addEventListener("click", (e) => {
-    if (e.target === popup) popup.classList.add("hidden");
+  // Close popup
+  popupClose.addEventListener("click", () => popup.style.display = "none");
+  window.addEventListener("click", e => { if (e.target === popup) popup.style.display = "none"; });
+
+  // Add to cart
+  popupForm.addEventListener("submit", async e => {
+    e.preventDefault();
+
+    const variants = JSON.parse(popup.dataset.variants);
+    let selectedVariant = variants[0];
+
+    // match variant from selects
+    const selects = popupVariants.querySelectorAll("select");
+    if (selects.length > 0) {
+      variants.forEach(v => {
+        if (selects.length === v.options.length &&
+            v.options.every((opt, idx) => opt === selects[idx].value)) {
+          selectedVariant = v;
+        }
+      });
+    }
+
+    // Add selected product
+    await fetch("/cart/add.js", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: selectedVariant.id, quantity: 1 })
+    });
+
+    // Special condition: if Color = Black & Size = Medium → add Soft Winter Jacket
+    if (selectedVariant.options.includes("Black") && selectedVariant.options.includes("Medium")) {
+      const jacket = await fetch("/products/soft-winter-jacket.js").then(r => r.json());
+      if (jacket && jacket.variants[0]) {
+        await fetch("/cart/add.js", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: jacket.variants[0].id, quantity: 1 })
+        });
+      }
+    }
+
+    alert("Added to cart!");
+    popup.style.display = "none";
   });
 });
 </script>
