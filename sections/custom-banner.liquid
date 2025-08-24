@@ -129,12 +129,6 @@
             {% endfor %}
           </select>
         {% endif %}
-
-        <form method="post" action="/cart/add">
-          <input type="hidden" name="id" value="{{ product.variants.first.id }}">
-          <button type="submit" class="add-to-cart">Add to Cart</button>
-        </form>
-
         <!-- Custom Popup CTA Button -->
         <a href="{{ section.settings.popup_cta_link }}" class="popup-cta">
           {{ section.settings.popup_cta_text }}
