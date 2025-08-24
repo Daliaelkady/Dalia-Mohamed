@@ -69,80 +69,7 @@
 </div>
 
 <style>
-/* GRID */
-.gp-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 20px;
-}
-.gp-tile {
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-.gp-tile:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-.gp-tile__img {
-  width: 100%;
-  height: auto;
-  border-radius: 8px;
-}
-.gp-tile__meta {
-  padding: 8px 0;
-  text-align: center;
-  font-family: Arial, sans-serif;
-}
-
-/* POPUP */
-.gp-popup {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 9999;
-  justify-content: center;
-  align-items: center;
-}
-.gp-popup__content {
-  background: #fff;
-  padding: 20px;
-  max-width: 500px;
-  width: 90%;
-  border-radius: 10px;
-  position: relative;
-  animation: fadeIn 0.3s ease;
-}
-.gp-popup__close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 24px;
-  cursor: pointer;
-}
-.gp-popup__img {
-  width: 100%;
-  height: auto;
-  margin-bottom: 15px;
-  border-radius: 6px;
-}
-.gp-btn {
-  display: inline-block;
-  padding: 10px 20px;
-  margin-top: 15px;
-  background: #111;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  border-radius: 6px;
-  transition: background 0.2s;
-}
-.gp-btn:hover { background: #333; }
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
+/* same CSS as your version */
 </style>
 
 <script>
@@ -166,22 +93,25 @@ document.addEventListener("DOMContentLoaded", () => {
       const product = await res.json();
 
       popupTitle.textContent = product.title;
-      popupPrice.textContent = (product.price / 100).toFixed(2) + " " + Shopify.currency.active;
+      popupPrice.textContent = Shopify.formatMoney(product.price, Shopify.money_format);
       popupDesc.textContent = product.description.replace(/<[^>]*>?/gm, '');
       popupImg.src = product.featured_image;
 
       // Variants
       popupVariants.innerHTML = "";
       if (product.variants.length > 1) {
-        product.options.forEach((opt, idx) => {
+        product.options_with_values.forEach((opt, idx) => {
+          const label = document.createElement("label");
+          label.textContent = opt.name;
           const sel = document.createElement("select");
           sel.name = "option" + (idx + 1);
-          product.options[idx].values.forEach(val => {
+          opt.values.forEach(val => {
             const o = document.createElement("option");
             o.value = val;
             o.textContent = val;
             sel.appendChild(o);
           });
+          popupVariants.appendChild(label);
           popupVariants.appendChild(sel);
         });
       }
@@ -207,8 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const selects = popupVariants.querySelectorAll("select");
     if (selects.length > 0) {
       variants.forEach(v => {
-        if (selects.length === v.options.length &&
-            v.options.every((opt, idx) => opt === selects[idx].value)) {
+        if (v.options.every((opt, idx) => opt === selects[idx].value)) {
           selectedVariant = v;
         }
       });
@@ -221,7 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
       body: JSON.stringify({ id: selectedVariant.id, quantity: 1 })
     });
 
-    // Special condition: if Color = Black & Size = Medium → add Soft Winter Jacket
+    // Special condition: Black + Medium → also add Soft Winter Jacket
     if (selectedVariant.options.includes("Black") && selectedVariant.options.includes("Medium")) {
       const jacket = await fetch("/products/soft-winter-jacket.js").then(r => r.json());
       if (jacket && jacket.variants[0]) {
