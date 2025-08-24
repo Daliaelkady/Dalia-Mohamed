@@ -1,229 +1,229 @@
 {% schema %}
 {
   "name": "Product Grid with Popup",
-  "settings": [],
-  "blocks": [
+  "settings": [
     {
-      "type": "product",
-      "name": "Product",
-      "settings": [
-        {
-          "type": "product",
-          "id": "product",
-          "label": "Select product"
-        }
-      ]
+      "type": "product_list",
+      "id": "products",
+      "label": "Select Products",
+      "limit": 6
+    },
+    {
+      "type": "font_picker",
+      "id": "custom_font",
+      "label": "Custom Font",
+      "default": "sans-serif"
     }
   ],
-  "max_blocks": 6,
   "presets": [
     {
-      "name": "Product Grid with Popup"
+      "name": "Grid with Popup",
+      "category": "Custom"
     }
   ]
 }
 {% endschema %}
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
-<style>
-  .product-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    padding: 20px;
-    font-family: "Poppins", sans-serif;
-  }
-
-  .product-card {
-    border: 1px solid #eee;
-    border-radius: 12px;
-    padding: 16px;
-    text-align: center;
-    background: #fff;
-    cursor: pointer;
-    transition: transform 0.3s;
-  }
-
-  .product-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  }
-
-  .product-card h3 {
-    font-weight: 600;
-    margin: 10px 0;
-  }
-
-  .popup-overlay {
-    display: none;
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.6);
-    justify-content: center;
-    align-items: center;
-    z-index: 999;
-  }
-
-  .popup {
-    background: #fff;
-    border-radius: 16px;
-    max-width: 500px;
-    width: 90%;
-    padding: 24px;
-    position: relative;
-    font-family: "Poppins", sans-serif;
-  }
-
-  .popup h2 {
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
-
-  .popup p {
-    margin: 6px 0;
-  }
-
-  .popup button.close-popup {
-    position: absolute;
-    top: 10px; right: 10px;
-    background: none;
-    border: none;
-    font-size: 20px;
-    cursor: pointer;
-  }
-
-  .variant-select {
-    margin: 12px 0;
-    width: 100%;
-    padding: 8px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-  }
-
-  .add-to-cart {
-    background: #000;
-    color: #fff;
-    border: none;
-    padding: 12px;
-    width: 100%;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: background 0.3s;
-  }
-
-  .add-to-cart:hover {
-    background: #444;
-  }
-
-  @media (max-width: 768px) {
-    .product-grid {
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    }
-  }
-</style>
-
-<div class="product-grid">
-  {% for block in section.blocks %}
-    {% assign product = all_products[block.settings.product] %}
-    {% if product %}
-      <div class="product-card" 
-           data-handle="{{ product.handle }}" 
-           data-title="{{ product.title }}" 
-           data-price="{{ product.price | money }}" 
-           data-description="{{ product.description | escape }}">
-        <img src="{{ product.featured_image | img_url: '300x300' }}" alt="{{ product.title }}">
-        <h3>{{ product.title }}</h3>
-        <p>{{ product.price | money }}</p>
-        <button class="details-btn">View Details</button>
+<div class="custom-grid" style="font-family: {{ section.settings.custom_font }};">
+  {% for product in section.settings.products %}
+    {% assign product_obj = all_products[product] %}
+    {% if product_obj %}
+      <div class="grid-item" data-handle="{{ product_obj.handle }}">
+        <img src="{{ product_obj.featured_image | img_url: '400x' }}" alt="{{ product_obj.title }}">
+        <h3>{{ product_obj.title }}</h3>
+        <p>{{ product_obj.price | money }}</p>
+        <button class="details-btn" data-handle="{{ product_obj.handle }}">Details</button>
       </div>
     {% endif %}
   {% endfor %}
 </div>
 
-<div class="popup-overlay" id="popupOverlay">
-  <div class="popup" id="popup">
-    <button class="close-popup">&times;</button>
-    <h2 id="popupTitle"></h2>
-    <p id="popupPrice"></p>
-    <p id="popupDescription"></p>
-    <select id="variantSelect" class="variant-select"></select>
-    <button id="addToCartBtn" class="add-to-cart">Add to Cart</button>
+<!-- Popup Modal -->
+<div id="product-popup" class="popup hidden">
+  <div class="popup-content">
+    <span class="close-btn">&times;</span>
+    <div class="popup-body">
+      <img id="popup-image" src="" alt="">
+      <h2 id="popup-title"></h2>
+      <p id="popup-price"></p>
+      <p id="popup-description"></p>
+      <form id="variant-form">
+        <label for="variant-select">Choose Variant:</label>
+        <select id="variant-select"></select>
+        <button type="submit" class="add-to-cart">Add to Cart</button>
+      </form>
+    </div>
   </div>
 </div>
 
+<style>
+/* Grid Styling */
+.custom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.grid-item {
+  border: 1px solid #ddd;
+  padding: 15px;
+  text-align: center;
+  border-radius: 10px;
+  background: #fff;
+  transition: transform 0.2s ease;
+}
+
+.grid-item:hover {
+  transform: scale(1.05);
+}
+
+.grid-item img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.details-btn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.details-btn:hover {
+  background: #444;
+}
+
+/* Popup Styling */
+.popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.popup.hidden {
+  display: none;
+}
+
+.popup-content {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  text-align: center;
+  position: relative;
+}
+
+.close-btn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.add-to-cart {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: green;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.add-to-cart:hover {
+  background: darkgreen;
+}
+
+/* Mobile Responsive */
+@media(max-width: 600px) {
+  .custom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
 <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const overlay = document.getElementById("popupOverlay");
-    const popupTitle = document.getElementById("popupTitle");
-    const popupPrice = document.getElementById("popupPrice");
-    const popupDescription = document.getElementById("popupDescription");
-    const variantSelect = document.getElementById("variantSelect");
-    const addToCartBtn = document.getElementById("addToCartBtn");
-    let currentProductHandle = null;
-    let currentProductData = null;
+document.addEventListener("DOMContentLoaded", () => {
+  const popup = document.getElementById("product-popup");
+  const closeBtn = document.querySelector(".close-btn");
+  const popupImage = document.getElementById("popup-image");
+  const popupTitle = document.getElementById("popup-title");
+  const popupPrice = document.getElementById("popup-price");
+  const popupDescription = document.getElementById("popup-description");
+  const variantSelect = document.getElementById("variant-select");
+  const variantForm = document.getElementById("variant-form");
 
-    // Open popup
-    document.querySelectorAll(".details-btn").forEach(btn => {
-      btn.addEventListener("click", async (e) => {
-        const card = e.target.closest(".product-card");
-        currentProductHandle = card.dataset.handle;
+  document.querySelectorAll(".details-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      const handle = e.target.dataset.handle;
 
-        // Fetch product JSON
-        const res = await fetch(`/products/${currentProductHandle}.js`);
-        currentProductData = await res.json();
+      // Fetch product JSON
+      const response = await fetch(`/products/${handle}.js`);
+      const product = await response.json();
 
-        popupTitle.textContent = currentProductData.title;
-        popupPrice.textContent = Shopify.formatMoney(currentProductData.price, "{{ shop.money_format }}");
-        popupDescription.textContent = currentProductData.description;
+      // Populate popup
+      popupImage.src = product.featured_image;
+      popupTitle.textContent = product.title;
+      popupPrice.textContent = (product.price / 100).toFixed(2) + " " + Shopify.currency.active;
+      popupDescription.textContent = product.description;
 
-        // Populate variants
-        variantSelect.innerHTML = "";
-        currentProductData.variants.forEach(v => {
-          let option = document.createElement("option");
-          option.value = v.id;
-          option.textContent = v.title;
-          variantSelect.appendChild(option);
-        });
-
-        overlay.style.display = "flex";
+      // Populate variants
+      variantSelect.innerHTML = "";
+      product.variants.forEach(v => {
+        let option = document.createElement("option");
+        option.value = v.id;
+        option.textContent = v.title + " - " + (v.price / 100).toFixed(2) + " " + Shopify.currency.active;
+        variantSelect.appendChild(option);
       });
+
+      popup.classList.remove("hidden");
+    });
+  });
+
+  closeBtn.addEventListener("click", () => {
+    popup.classList.add("hidden");
+  });
+
+  variantForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const variantId = variantSelect.value;
+
+    // Add selected product to cart
+    await fetch("/cart/add.js", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: variantId, quantity: 1 })
     });
 
-    // Close popup
-    document.querySelector(".close-popup").addEventListener("click", () => {
-      overlay.style.display = "none";
-    });
-
-    // Add to Cart
-    addToCartBtn.addEventListener("click", async () => {
-      const variantId = variantSelect.value;
-
-      // Add selected product
+    // Fetch variant info to check Black + Medium condition
+    const variantText = variantSelect.options[variantSelect.selectedIndex].text;
+    if (variantText.includes("Black") && variantText.includes("Medium")) {
+      // Add Soft Winter Jacket automatically
+      const response = await fetch(`/products/soft-winter-jacket.js`);
+      const softProduct = await response.json();
+      const firstVariant = softProduct.variants[0];
       await fetch("/cart/add.js", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: variantId, quantity: 1 })
+        body: JSON.stringify({ id: firstVariant.id, quantity: 1 })
       });
+    }
 
-      // Check for condition (Black + Medium)
-      const selectedVariant = currentProductData.variants.find(v => v.id == variantId);
-      if (selectedVariant && selectedVariant.title.includes("Black") && selectedVariant.title.includes("Medium")) {
-        // Auto add "Soft Winter Jacket"
-        const jacket = await fetch("/products/soft-winter-jacket.js");
-        const jacketData = await jacket.json();
-        const jacketVariant = jacketData.variants[0];
-
-        await fetch("/cart/add.js", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: jacketVariant.id, quantity: 1 })
-        });
-      }
-
-      alert("Added to cart!");
-      overlay.style.display = "none";
-    });
+    alert("Product added to cart!");
+    popup.classList.add("hidden");
   });
+});
 </script>
