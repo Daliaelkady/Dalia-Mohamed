@@ -16,12 +16,10 @@
         "background_image": "shopify://shop_images/black-and-blue-clothing-on-a-rack-in-a-sunlit-shop.jpg",
         "logo_text": "DALIA DH",
         "top_message": "Discover meaningful gifts that bring joy to the ones you cherish most.",
-        "top_button_text": "CHOOSE GIFT",
-        "popup_content": "Your popup message or HTML goes here!",
+        "cta_text": "SHOP NOW",
+        "cta_link": "shopify://collections/all",
         "title": "The Gift Guide",
         "subtitle": "Celebrate the season with thoughtful gifts. From timeless classics to unique finds, discover treasures that bring joy to everyone on your list.",
-        "cta_text": "SHOP NOW",
-        "cta_link": "",
         "footer_text": "Consciously crafted fashion, made with care for people and the planet — available in sizes XXS to 6XL."
       }
     },
