@@ -16,11 +16,16 @@
         "background_image": "shopify://shop_images/black-and-blue-clothing-on-a-rack-in-a-sunlit-shop.jpg",
         "logo_text": "DALIA DH",
         "top_message": "Discover meaningful gifts that bring joy to the ones you cherish most.",
-        "cta_text": "SHOP NOW",
-        "cta_link": "shopify://collections/all",
+        "top_button_text": "Choose Gift",
         "title": "The Gift Guide",
         "subtitle": "Celebrate the season with thoughtful gifts. From timeless classics to unique finds, discover treasures that bring joy to everyone on your list.",
-        "footer_text": "Consciously crafted fashion, made with care for people and the planet — available in sizes XXS to 6XL."
+        "cta_text": "SHOP NOW",
+        "cta_link": "shopify://collections/all",
+        "popup_title": "Find the Perfect Gift",
+        "popup_message": "Browse our special selection of thoughtful gifts for your loved ones.",
+        "footer_text": "Consciously crafted fashion, made with care for people and the planet — available in sizes XXS to 6XL.",
+        "popup_cta_text": "Explore Now",
+        "popup_cta_link": "shopify://products/yellow-wool-jumper"
       }
     },
     "custom_grid_KHXJqQ": {
