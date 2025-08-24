@@ -14,23 +14,56 @@
 {% endschema %}
 
 <style>
-/* Grid styles */
+/* Grid Styles */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin: 40px 0;
+  gap: 30px;
+  margin: 50px auto;
+  max-width: 1200px;
 }
 .product-block {
-  text-align: center;
-  border: 1px solid #e0e0e0;
+  background: #fff;
+  border-radius: 12px;
   padding: 20px;
+  text-align: center;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
 }
-.product-block:hover { transform: translateY(-5px); }
-.product-block img { max-width: 100%; height: auto; margin-bottom: 10px; }
+.product-block:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.2);
+}
+.product-block img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+.product-block h3 {
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  color: #333;
+}
+.product-block p {
+  font-size: 1rem;
+  color: #666;
+}
+.product-block .btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #ff6f61;
+  color: #fff;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+.product-block .btn:hover { background: #ff3b2f; }
 
+/* Popup Styles */
 .popup {
   display: none;
   position: fixed;
@@ -39,19 +72,60 @@
   background: rgba(0,0,0,0.6);
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 9999;
 }
 .popup-content {
   background: #fff;
-  padding: 30px;
+  padding: 40px;
   max-width: 600px;
   width: 90%;
+  border-radius: 12px;
   position: relative;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+  overflow-y: auto;
+  max-height: 90vh;
 }
 .popup-close {
-  position: absolute; top: 10px; right: 15px;
-  font-size: 20px;
+  position: absolute;
+  top: 15px; right: 20px;
+  font-size: 24px;
+  font-weight: bold;
   cursor: pointer;
+  color: #333;
+}
+.popup h2 {
+  margin-bottom: 15px;
+  color: #333;
+}
+.popup p {
+  margin-bottom: 15px;
+  color: #555;
+}
+.popup form select {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+.popup form .btn {
+  width: 100%;
+  background: #ff6f61;
+  padding: 12px;
+  font-weight: bold;
+  border-radius: 6px;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+.popup form .btn:hover { background: #ff3b2f; }
+
+/* Responsive */
+@media (max-width: 992px) {
+  .product-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 600px) {
+  .product-grid { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -62,13 +136,10 @@
     {% if product_handle %}
       {% assign product = all_products[product_handle] %}
       {% if product %}
-        <div class="product-block">
+        <div class="product-block" data-handle="{{ product.handle }}">
           <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-          <div class="product-info">
-            <h3>{{ product.title }}</h3>
-            <p>{{ product.price | money }}</p>
-            <a href="{{ product.url }}" class="btn">View Product</a>
-          </div>
+          <h3>{{ product.title }}</h3>
+          <p>{{ product.price | money }}</p>
         </div>
       {% endif %}
     {% endif %}
@@ -87,12 +158,61 @@ document.addEventListener('DOMContentLoaded', function() {
 
   blocks.forEach(block => {
     block.addEventListener('click', () => {
-      popupContent.innerHTML = '<span class="popup-close">&times;</span>' + block.querySelector('.product-info').innerHTML;
-      popup.style.display = 'flex';
+      const handle = block.dataset.handle;
 
-      popupContent.querySelector('.popup-close').addEventListener('click', () => {
-        popup.style.display = 'none';
-      });
+      fetch(`/products/${handle}.js`)
+        .then(res => res.json())
+        .then(product => {
+          let variantOptions = '';
+
+          if (product.variants.length > 1) {
+            variantOptions += '<form id="popup-form">';
+            product.options.forEach((option, i) => {
+              variantOptions += `<label>${option}</label><select name="option${i+1}">`;
+              product.variants.forEach(variant => {
+                variantOptions += `<option value="${variant.id}">${variant['option'+(i+1)]}</option>`;
+              });
+              variantOptions += '</select>';
+            });
+            variantOptions += `<button type="submit" class="btn">Add to Cart</button></form>`;
+          } else {
+            variantOptions += `<form id="popup-form">
+                                  <input type="hidden" name="id" value="${product.variants[0].id}">
+                                  <button type="submit" class="btn">Add to Cart</button>
+                               </form>`;
+          }
+
+          popupContent.innerHTML = `
+            <span class="popup-close">&times;</span>
+            <h2>${product.title}</h2>
+            <p><strong>${(product.price/100).toFixed(2)} ${Shopify.currency.active}</strong></p>
+            <p>${product.description}</p>
+            ${variantOptions}
+          `;
+
+          popup.style.display = 'flex';
+
+          const form = document.querySelector('#popup-form');
+          form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(form);
+
+            fetch('/cart/add.js', {
+              method: 'POST',
+              body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+              alert(`${product.title} has been added to your cart!`);
+              popup.style.display = 'none';
+            })
+            .catch(err => console.error(err));
+          });
+
+          popupContent.querySelector('.popup-close').addEventListener('click', () => {
+            popup.style.display = 'none';
+          });
+        });
     });
   });
 
