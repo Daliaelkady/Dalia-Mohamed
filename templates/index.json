@@ -27,54 +27,15 @@
     },
     "custom_grid_KHXJqQ": {
       "type": "custom-grid",
-      "blocks": {
-        "product_TaWHji": {
-          "type": "product",
-          "settings": {
-            "product": "longsleeve-cotton-top"
-          }
-        },
-        "product_wygrdX": {
-          "type": "product",
-          "settings": {
-            "product": "dark-denim-top"
-          }
-        },
-        "product_AXTJgH": {
-          "type": "product",
-          "settings": {
-            "product": "ocean-blue-shirt"
-          }
-        },
-        "product_yEQqGW": {
-          "type": "product",
-          "settings": {
-            "product": "striped-silk-blouse"
-          }
-        },
-        "product_NChTcq": {
-          "type": "product",
-          "settings": {
-            "product": "navy-sport-jacket"
-          }
-        },
-        "product_JifhtN": {
-          "type": "product",
-          "settings": {
-            "product": "olive-green-jacket"
-          }
-        }
-      },
-      "block_order": [
-        "product_TaWHji",
-        "product_wygrdX",
-        "product_AXTJgH",
-        "product_yEQqGW",
-        "product_NChTcq",
-        "product_JifhtN"
-      ],
       "name": "Product Grid Popup",
-      "settings": {}
+      "settings": {
+        "product_1": "classic-leather-jacket",
+        "product_2": "led-high-tops",
+        "product_3": "longsleeve-cotton-top",
+        "product_4": "classic-varsity-top",
+        "product_5": "black-leather-bag",
+        "product_6": "olive-green-jacket"
+      }
     }
   },
   "order": [
