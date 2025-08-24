@@ -23,7 +23,13 @@
       "type": "text",
       "id": "top_button_text",
       "label": "Popup Button Text",
-      "default": "Choose GIFT"
+      "default": "Choose Gift"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Button Text",
+      "default": "Shop Now"
     },
     {
       "type": "url",
@@ -47,12 +53,6 @@
       "id": "footer_text",
       "label": "Footer Text",
       "default": "Consciously crafted fashion, made with care for people and the planet — available in sizes XXS to 6XL."
-    },
-    {
-      "type": "text",
-      "id": "popup_product_handle",
-      "label": "Popup Product Handle",
-      "default": "rose-bouquet"
     }
   ],
   "presets": [
@@ -67,6 +67,7 @@
   <div class="banner-top fade-down">
     <div class="logo">✦ {{ section.settings.logo_text }}</div>
     <div class="top-message">★ {{ section.settings.top_message }}</div>
+    <!-- Popup Button -->
     <button class="top-btn" id="popup-trigger">
       {{ section.settings.top_button_text }} →
     </button>
@@ -75,6 +76,7 @@
   <div class="banner-content">
     <h1 class="banner-title fade-up">✧ {{ section.settings.title }}</h1>
     <p class="banner-subtitle fade-up delay-1">{{ section.settings.subtitle }}</p>
+    <!-- CTA Button -->
     <a href="{{ section.settings.cta_link }}" class="cta-btn fade-up delay-2">
       {{ section.settings.cta_text }} →
     </a>
@@ -90,7 +92,7 @@
   <div class="popup-box">
     <button class="popup-close" id="popup-close">×</button>
     <div class="popup-content">
-      {% assign product = all_products[section.settings.popup_product_handle] %}
+      {% assign product = all_products['gift-product-handle'] %}
       {% if product %}
         <h2>{{ product.title }}</h2>
         <p>{{ product.description | strip_html | truncate: 150 }}</p>
@@ -106,11 +108,11 @@
         {% endif %}
 
         <form method="post" action="/cart/add">
-          <input type="hidden" name="id" value="{{ product.variants.first.id }}" id="variant-id">
+          <input type="hidden" name="id" value="{{ product.variants.first.id }}">
           <button type="submit" class="add-to-cart">Add to Cart</button>
         </form>
       {% else %}
-        <p>No product found. Please check your product handle in the settings.</p>
+        <p>No product found. Update the handle in the code.</p>
       {% endif %}
     </div>
   </div>
@@ -132,125 +134,35 @@
 }
 
 /* Animations */
-.fade-up {
-  opacity: 0;
-  transform: translateY(40px);
-  animation: fadeUp 1s forwards;
-}
-.fade-down {
-  opacity: 0;
-  transform: translateY(-40px);
-  animation: fadeDown 1s forwards;
-}
+.fade-up { opacity:0; transform:translateY(40px); animation: fadeUp 1s forwards; }
+.fade-down { opacity:0; transform:translateY(-40px); animation: fadeDown 1s forwards; }
 .delay-1 { animation-delay: 0.3s; }
 .delay-2 { animation-delay: 0.6s; }
 .delay-3 { animation-delay: 0.9s; }
-
-@keyframes fadeUp {
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes fadeDown {
-  to { opacity: 1; transform: translateY(0); }
-}
+@keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+@keyframes fadeDown { to { opacity:1; transform:translateY(0); } }
 
 /* Top bar */
-.banner-top {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.logo {
-  font-size: 20px;
-  font-weight: bold;
-}
-.top-message {
-  flex: 1;
-  text-align: center;
-  font-size: 14px;
-}
-.top-btn {
-  background: yellow;
-  color: black;
-  padding: 10px 20px;
-  font-weight: bold;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-.top-btn:hover {
-  background: black;
-  color: white;
-}
+.banner-top { display:flex; justify-content:space-between; align-items:center; }
+.logo { font-size:20px; font-weight:bold; }
+.top-message { flex:1; text-align:center; font-size:14px; }
+.top-btn { background:yellow; color:black; padding:10px 20px; font-weight:bold; border-radius:4px; border:none; cursor:pointer; transition: all 0.3s ease; }
+.top-btn:hover { background:black; color:white; }
 
 /* Center Content */
-.banner-content {
-  text-align: center;
-  margin-top: auto;
-  margin-bottom: auto;
-}
-.banner-title {
-  font-size: 48px;
-  font-weight: bold;
-}
-.banner-subtitle {
-  max-width: 600px;
-  margin: 20px auto;
-  font-size: 16px;
-}
-.cta-btn {
-  background: black;
-  color: white;
-  padding: 12px 24px;
-  display: inline-block;
-  text-decoration: none;
-  font-weight: bold;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-.cta-btn:hover {
-  background: #333;
-}
+.banner-content { text-align:center; margin-top:auto; margin-bottom:auto; }
+.banner-title { font-size:48px; font-weight:bold; }
+.banner-subtitle { max-width:600px; margin:20px auto; font-size:16px; }
+.cta-btn { background:black; color:white; padding:12px 24px; display:inline-block; text-decoration:none; font-weight:bold; border-radius:4px; transition: all 0.3s ease; }
+.cta-btn:hover { background:#333; }
 
-.banner-footer {
-  text-align: center;
-  font-size: 14px;
-  margin-top: 20px;
-}
+.banner-footer { text-align:center; font-size:14px; margin-top:20px; }
 
 /* Popup */
-.popup-overlay {
-  display: none;
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-.popup-box {
-  background: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  max-width: 500px;
-  width: 90%;
-  position: relative;
-  text-align: center;
-  animation: fadeIn 0.3s ease;
-}
-.popup-close {
-  position: absolute;
-  top: 10px; right: 10px;
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
+.popup-overlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:9999; }
+.popup-box { background:#fff; padding:30px; border-radius:8px; max-width:500px; width:90%; position:relative; text-align:center; animation:fadeIn 0.3s ease; }
+.popup-close { position:absolute; top:10px; right:10px; background:none; border:none; font-size:20px; cursor:pointer; }
+@keyframes fadeIn { from {opacity:0; transform:scale(0.9);} to {opacity:1; transform:scale(1);} }
 </style>
 
 <script>
@@ -258,8 +170,6 @@ document.addEventListener("DOMContentLoaded", function() {
   var trigger = document.getElementById("popup-trigger");
   var overlay = document.getElementById("popup-overlay");
   var closeBtn = document.getElementById("popup-close");
-  var variantSelect = document.getElementById("variant-select");
-  var variantIdInput = document.getElementById("variant-id");
 
   trigger.addEventListener("click", function() {
     overlay.style.display = "flex";
@@ -270,16 +180,7 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 
   overlay.addEventListener("click", function(e) {
-    if(e.target === overlay) {
-      overlay.style.display = "none";
-    }
+    if(e.target === overlay) overlay.style.display = "none";
   });
-
-  // Update selected variant in form
-  if(variantSelect) {
-    variantSelect.addEventListener("change", function() {
-      variantIdInput.value = this.value;
-    });
-  }
 });
 </script>
