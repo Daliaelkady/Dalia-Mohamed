@@ -1,139 +1,96 @@
 {% schema %}
 {
   "name": "Product Grid with Popup",
-  "settings": [
-    { "type": "product", "id": "product_1", "label": "Product 1" },
-    { "type": "product", "id": "product_2", "label": "Product 2" },
-    { "type": "product", "id": "product_3", "label": "Product 3" },
-    { "type": "product", "id": "product_4", "label": "Product 4" },
-    { "type": "product", "id": "product_5", "label": "Product 5" },
-    { "type": "product", "id": "product_6", "label": "Product 6" }
+  "settings": [],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "id": "product",
+          "type": "product",
+          "label": "Choose product"
+        }
+      ]
+    }
   ],
-  "presets": [ { "name": "Product Grid" } ]
+  "presets": [
+    {
+      "name": "Product Grid with Popup"
+    }
+  ]
 }
 {% endschema %}
 
 <style>
-/* Grid Styles */
 .product-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 30px;
-  margin: 50px auto;
-  max-width: 1200px;
-}
-.product-block {
-  background: #fff;
-  border-radius: 12px;
-  padding: 20px;
-  text-align: center;
-  cursor: pointer;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
-}
-.product-block:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.2);
-}
-.product-block img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin-bottom: 15px;
-}
-.product-block h3 {
-  font-size: 1.2rem;
-  margin-bottom: 10px;
-  color: #333;
-}
-.product-block p {
-  font-size: 1rem;
-  color: #666;
+  gap: 20px;
 }
 
-/* Popup Styles */
+.product-block {
+  border: 1px solid #ddd;
+  padding: 10px;
+  cursor: pointer;
+  text-align: center;
+  transition: transform 0.2s ease;
+}
+.product-block:hover {
+  transform: scale(1.05);
+}
+
+.product-block img {
+  width: 100%;
+  height: auto;
+}
+
 .popup {
   display: none;
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.6);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
   justify-content: center;
   align-items: center;
   z-index: 9999;
 }
+
 .popup-content {
   background: #fff;
-  padding: 40px;
-  max-width: 600px;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
   width: 90%;
-  border-radius: 12px;
   position: relative;
-  box-shadow: 0 12px 35px rgba(0,0,0,0.3);
-  overflow-y: auto;
-  max-height: 90vh;
 }
+
 .popup-close {
   position: absolute;
-  top: 15px; right: 20px;
-  font-size: 24px;
-  font-weight: bold;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
   cursor: pointer;
-  color: #333;
-}
-.popup h2 {
-  margin-bottom: 15px;
-  color: #333;
-}
-.popup p {
-  margin-bottom: 15px;
-  color: #555;
-}
-.popup form select {
-  width: 100%;
-  padding: 8px 12px;
-  margin-bottom: 15px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-.popup form .btn {
-  width: 100%;
-  background: #ff6f61;
-  padding: 12px;
-  font-weight: bold;
-  border-radius: 6px;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
-.popup form .btn:hover { background: #ff3b2f; }
-
-/* Responsive */
-@media (max-width: 992px) {
-  .product-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 600px) {
-  .product-grid { grid-template-columns: 1fr; }
 }
 </style>
 
 <div class="product-grid">
-  {% for i in (1..6) %}
-    {% assign product_key = 'product_' | append: i %}
-    {% assign product_handle = section.settings[product_key] %}
-    {% if product_handle %}
-      {% assign product = all_products[product_handle] %}
-      {% if product %}
-        <div class="product-block" data-handle="{{ product.handle }}">
-          <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
-          <h3>{{ product.title }}</h3>
-          <p>{{ product.price | money }}</p>
-        </div>
-      {% endif %}
+  {% for block in section.blocks %}
+    {% assign product = all_products[block.settings.product] %}
+    {% if product %}
+      <div class="product-block" data-handle="{{ product.handle }}">
+        <img src="{{ product.featured_image | img_url: 'medium' }}" alt="{{ product.title }}">
+        <h3>{{ product.title }}</h3>
+        <p>{{ product.price | money }}</p>
+      </div>
     {% endif %}
   {% endfor %}
 </div>
 
+<!-- Popup -->
 <div class="popup">
   <div class="popup-content"></div>
 </div>
@@ -147,10 +104,13 @@ document.addEventListener('DOMContentLoaded', function() {
   blocks.forEach(block => {
     block.addEventListener('click', () => {
       const handle = block.dataset.handle;
+      console.log("Clicked:", handle); // debug
 
-      fetch(`/products/${handle}.js`)
+      fetch(window.Shopify.routes.root + `products/${handle}.js`)
         .then(res => res.json())
         .then(product => {
+          console.log("Product loaded:", product); // debug
+
           let variantOptions = '';
 
           if (product.variants.length > 1) {
@@ -180,65 +140,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
           popup.style.display = 'flex';
 
-          const form = document.querySelector('#popup-form');
-          form.addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Find selected variant
-            let selectedVariantId;
-            if (product.variants.length > 1) {
-              const selects = form.querySelectorAll('select');
-              const chosenValues = Array.from(selects).map(s => s.value);
-
-              // Match chosen values with product variants
-              const selectedVariant = product.variants.find(v =>
-                chosenValues.every(val => Object.values(v).includes(val))
-              );
-              selectedVariantId = selectedVariant ? selectedVariant.id : null;
-            } else {
-              selectedVariantId = product.variants[0].id;
-            }
-
-            if (!selectedVariantId) {
-              alert("Please select a variant.");
-              return;
-            }
-
-            const formData = new FormData();
-            formData.append('id', selectedVariantId);
-            formData.append('quantity', 1);
-
-            fetch('/cart/add.js', {
-              method: 'POST',
-              body: formData
-            })
-            .then(res => res.json())
-            .then(data => {
-              alert(`${product.title} has been added to your cart!`);
-
-              // ✅ Special Rule: if "Black" + "Medium" variant, also add Soft Winter Jacket
-              if (data.title.includes("Black") && data.title.includes("Medium")) {
-                fetch('/cart/add.js', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    id: "REPLACE_WITH_SOFT_WINTER_JACKET_VARIANT_ID",
-                    quantity: 1
-                  })
-                }).then(() => {
-                  console.log("Soft Winter Jacket auto-added");
-                });
-              }
-
-              popup.style.display = 'none';
-            })
-            .catch(err => console.error(err));
-          });
-
+          // Close popup
           popupContent.querySelector('.popup-close').addEventListener('click', () => {
             popup.style.display = 'none';
           });
-        });
+        })
+        .catch(err => console.error("Error fetching product:", err));
     });
   });
 
